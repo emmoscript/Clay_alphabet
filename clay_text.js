@@ -14,7 +14,14 @@
     animate   las letras caen una por una a saltos (stop-motion)
     jitter    cuánto "a mano" se ve: 0 = recto, 1 = normal, 2 = muy torcido
     tracking  espacio extra entre letras, en fracción del tamaño (default 0.02)
-    folder    carpeta de las imágenes (default "glyphs/")
+    folder    carpeta de las imágenes (default "glyphs/"); puede ser una URL de internet
+    color     color de la plastilina: bone, cocoa, red, blue, yellow, pink, sage
+              o un hex como "#5B4743" (default bone)
+
+  Las letras vienen en gris (solo el relieve) y aquí se pintan todas con la misma luz.
+
+  Sin glyphs.js cargado antes (por ejemplo en Streamlabs):
+    ClayText.load("https://.../glyphs/").then(() => ClayText.render(el, "hola", {...}))
 */
 (function () {
   const G = () => window.CLAY_GLYPHS;
@@ -43,11 +50,59 @@
     return null;
   }
 
+  // ---- color: mapa de degradado (sombra -> color -> brillo) aplicado al gris ----
+  const COLORS = { bone: "#EFE3D3", cocoa: "#6B5550", red: "#E8322B", blue: "#2E8BF0",
+                   yellow: "#F5D326", pink: "#D9A0A8", sage: "#7FB77E" };
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  function tintFilter(color) {
+    const c = (COLORS[color] || color || COLORS.bone).replace(/^([0-9a-f]{6})$/i, "#$1");
+    const id = "clay-tint-" + c.slice(1).toLowerCase();
+    if (document.getElementById(id)) return id;
+    const base = hex(c);
+    const shadow = base.map(v => v * 0.38);
+    const deep = base.map(v => v * 0.12);
+    const high = mix(base, [1, 1, 1], 0.5);
+    const N = 32, tables = [[], [], []];
+    for (let k = 0; k <= N; k++) {
+      const g = k / N;
+      const col = g < 0.32 ? mix(deep, shadow, g / 0.32)
+                : g < 0.78 ? mix(shadow, base, (g - 0.32) / 0.46)
+                : mix(base, high, (g - 0.78) / 0.22);
+      col.forEach((v, i) => tables[i].push(Math.min(1, Math.max(0, v)).toFixed(3)));
+    }
+    let svg = document.getElementById("clay-tints");
+    if (!svg) {
+      svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.id = "clay-tints";
+      svg.setAttribute("style", "position:absolute;width:0;height:0");
+      document.body.appendChild(svg);
+    }
+    svg.insertAdjacentHTML("beforeend",
+      `<filter id="${id}" color-interpolation-filters="sRGB"><feComponentTransfer>` +
+      ["R", "G", "B"].map((ch, i) => `<feFunc${ch} type="table" tableValues="${tables[i].join(" ")}"/>`).join("") +
+      `</feComponentTransfer></filter>`);
+    return id;
+  }
+
+  // carga glyphs.js desde una carpeta o URL (para cuando no se puede poner <script> antes)
+  function load(folder) {
+    if (window.CLAY_GLYPHS) return Promise.resolve();
+    return new Promise((ok, fail) => {
+      const s = document.createElement("script");
+      s.src = folder.replace(/\/?$/, "/") + "glyphs.js";
+      s.onload = ok; s.onerror = fail;
+      document.head.appendChild(s);
+    });
+  }
+
   function render(el, text, opts = {}) {
-    const o = Object.assign({ size: 90, maxWidth: 0, animate: false, jitter: 1, tracking: 0.02, folder: "glyphs/" }, opts);
+    const o = Object.assign({ size: 90, maxWidth: 0, animate: false, jitter: 1, tracking: 0.02, folder: "glyphs/", color: "bone" }, opts);
+    o.folder = o.folder.replace(/\/?$/, "/");
     const data = G();
     if (!data) { el.textContent = text; return; }
-    const k = o.size / data.cap;                 // de px del alfabeto a px en pantalla
+    const k = o.size / data.cap;
+    const tint = tintFilter(o.color);                 // de px del alfabeto a px en pantalla
     const seed = hash(text);
     el.innerHTML = "";
     el.style.display = "inline-flex";
@@ -71,7 +126,7 @@
       if (!vars) {                               // carácter que no está en el alfabeto
         const t = document.createElement("span");
         t.textContent = ch;
-        t.style.cssText = `font:700 ${0.9 * o.size}px/1 system-ui,sans-serif;color:#EFE3D3;margin:0 ${0.04 * o.size}px`;
+        t.style.cssText = `font:700 ${0.8 * o.size}px/1 system-ui,sans-serif;color:${COLORS[o.color] || o.color};margin:0 ${0.04 * o.size}px`;
         el.appendChild(t);
         continue;
       }
@@ -88,7 +143,7 @@
       const dy = (r2 - 0.5) * 0.05 * o.size * o.jitter;
       img.style.cssText = `height:${g.h * k}px;width:${g.w * k}px;display:block;flex:none;` +
         `margin:0 ${o.tracking * o.size}px ${-g.drop * k}px;` +
-        `transform:translateY(${dy}px) rotate(${rot}deg);transform-origin:50% 80%`;
+        `transform:translateY(${dy}px) rotate(${rot}deg);transform-origin:50% 80%;filter:url(#${tint})`;
       if (o.animate) {
         img.style.opacity = "0";
         img.animate(
@@ -109,5 +164,5 @@
     }
   }
 
-  window.ClayText = { render };
+  window.ClayText = { render, load, COLORS };
 })();

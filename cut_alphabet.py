@@ -29,6 +29,7 @@ from PIL import Image
 from scipy import ndimage as ndi
 
 CAP = 220          # alto final de una mayúscula, en px
+DIGIT = 0.80       # los números y símbolos, un poco más bajos que las mayúsculas
 
 SHEETS = {
     "upper_1": "ABCDEFGHI",
@@ -140,6 +141,23 @@ def cut_sheet(path, chars):
     return out
 
 
+def normalize_light(rgba):
+    """Misma luz y mismo color en todas las letras.
+    Se queda solo con el relieve (luces y sombras) en gris, y lo estira para que
+    todas las letras tengan el mismo tono medio y el mismo contraste. El color
+    final lo pone clay_text.js (parámetro color=)."""
+    rgb, a = rgba[..., :3], rgba[..., 3] / 255
+    g = rgb @ np.array([0.299, 0.587, 0.114], np.float32)
+    inside = a > 0.9
+    p5, p50, p97 = np.percentile(g[inside], [5, 50, 97])
+    src = [0, p5, p50, p97, 255]
+    dst = [0, 0.32, 0.78, 0.97, 1.0]
+    src = np.maximum.accumulate(np.array(src, np.float32) + np.arange(5) * 1e-3)
+    out = np.interp(g, src, dst) * 255
+    out = np.clip(out, 0, 255)
+    return np.dstack([out, out, out, rgba[..., 3]]).round().astype(np.uint8)
+
+
 def main(src, dst):
     src, dst = Path(src), Path(dst)
     dst.mkdir(parents=True, exist_ok=True)
@@ -177,12 +195,14 @@ def main(src, dst):
 
     manifest = {"cap": CAP, "xheight": round(XH), "glyphs": {}}
     for key, var, gl in sheets:
-        if key.startswith("upper") or key == "digits":
+        if key.startswith("upper"):
             ref, target = median_h(gl, lambda c: True), CAP
+        elif key == "digits":
+            ref, target = median_h(gl, lambda c: True), CAP * DIGIT
         elif key.startswith("lower"):
             ref, target = median_h(gl, lambda c: c in XHEIGHT), XH
         else:  # symbols: el 9 manda
-            ref, target = median_h(gl, lambda c: c == "9"), CAP
+            ref, target = median_h(gl, lambda c: c == "9"), CAP * DIGIT
         scale = target / ref
 
         # línea base por fila: mediana del borde inferior de las letras que no bajan
@@ -198,7 +218,7 @@ def main(src, dst):
             if b is None:  # fila sin referencia (raro): usar el borde inferior propio
                 b = g["bottom"]
             drop = (g["bottom"] - b) * scale
-            im = Image.fromarray(g["rgba"].round().astype(np.uint8), "RGBA")
+            im = Image.fromarray(normalize_light(g["rgba"]), "RGBA")
             w = max(1, round(im.width * scale))
             h = max(1, round(im.height * scale))
             im = im.resize((w, h), Image.LANCZOS)

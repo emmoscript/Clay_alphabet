@@ -6,6 +6,7 @@
     &max=1100       ancho máximo (se achica si no cabe)
     &anim=1         letras cayendo al cargar
     &jitter=1       0 = recto, 2 = muy torcido
+    &color=cocoa    bone, cocoa, red, blue, yellow, pink, sage o un hex sin # (5B4743)
 -->
 <html><head><meta charset="utf-8">
 <style>html,body{margin:0;background:transparent;overflow:hidden}
@@ -21,6 +22,7 @@ body{display:flex;align-items:center;justify-content:center;height:100vh}</style
     maxWidth: +(q.get('max') || innerWidth * 0.95),
     animate: q.get('anim') === '1',
     jitter: q.has('jitter') ? +q.get('jitter') : 1,
+    color: q.get('color') || 'bone',
   });
 </script>
 </body></html>

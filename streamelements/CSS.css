@@ -1,0 +1,5 @@
+/* pestaña CSS */
+.clay-alert   { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+#clay-name, #clay-amount { display: inline-flex; min-height: 1px; }
+.clay-message { font: 600 22px/1.3 "Fredoka", sans-serif; color: #5B4743; text-align: center; max-width: 700px; }
+.alertbox-message-emote { height: 1.3em; vertical-align: middle; }
