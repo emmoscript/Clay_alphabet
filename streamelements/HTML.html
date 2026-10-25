@@ -1,9 +1,10 @@
-<!-- StreamElements > Overlay > AlertBox > (tipo de alerta) > Custom CSS/HTML/JS > pestaña HTML -->
-<div class="clay-alert">
-  <!-- aquí aparece el nombre con letras de plastilina -->
-  <div id="clay-name" data-name="{{name}}"></div>
-  <!-- monto (donaciones, bits, meses de sub) -->
-  <div id="clay-amount" data-amount="{{amount}}"></div>
-  <!-- mensaje que escribió la persona -->
-  <div class="clay-message">{{message}}</div>
+<div id="stage">
+  <div id="alert">
+    <img id="media-img" alt="">
+    <video id="media-vid" muted playsinline></video>
+    <div id="name-box"><div id="clay-name"></div></div>
+    <div id="amount-box"><div id="clay-amount"></div></div>
+    <div id="message"></div>
+  </div>
 </div>
+<audio id="sound"></audio>

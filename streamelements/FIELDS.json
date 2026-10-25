@@ -1,0 +1,358 @@
+{
+  "baseUrl": {
+    "type": "text",
+    "label": "URL de la carpeta del alfabeto (jsDelivr)",
+    "value": "https://cdn.jsdelivr.net/gh/TU_USUARIO/clay-alphabet@v1/",
+    "group": "General"
+  },
+  "alertWidth": {
+    "type": "number",
+    "label": "Ancho de la alerta (px)",
+    "value": 700,
+    "group": "General"
+  },
+  "duration": {
+    "type": "number",
+    "label": "Duración de cada alerta (s)",
+    "value": 6,
+    "group": "General"
+  },
+  "volume": {
+    "type": "slider",
+    "label": "Volumen",
+    "value": 50,
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "group": "General"
+  },
+  "nameColor": {
+    "type": "dropdown",
+    "label": "Color del nombre",
+    "value": "cocoa",
+    "options": {
+      "bone": "Hueso",
+      "cocoa": "Cacao",
+      "red": "Rojo",
+      "blue": "Azul",
+      "yellow": "Amarillo",
+      "pink": "Rosa",
+      "sage": "Verde salvia"
+    },
+    "group": "Letras"
+  },
+  "nameSize": {
+    "type": "number",
+    "label": "Tamaño del nombre (px)",
+    "value": 60,
+    "group": "Letras"
+  },
+  "amountColor": {
+    "type": "dropdown",
+    "label": "Color del monto",
+    "value": "red",
+    "options": {
+      "bone": "Hueso",
+      "cocoa": "Cacao",
+      "red": "Rojo",
+      "blue": "Azul",
+      "yellow": "Amarillo",
+      "pink": "Rosa",
+      "sage": "Verde salvia"
+    },
+    "group": "Letras"
+  },
+  "amountSize": {
+    "type": "number",
+    "label": "Tamaño del monto (px)",
+    "value": 44,
+    "group": "Letras"
+  },
+  "jitter": {
+    "type": "slider",
+    "label": "Letras torcidas (0 = rectas)",
+    "value": 1,
+    "min": 0,
+    "max": 2,
+    "step": 0.1,
+    "group": "Letras"
+  },
+  "nameX": {
+    "type": "number",
+    "label": "Nombre: posición horizontal (% del ancho)",
+    "value": 58,
+    "group": "Posición"
+  },
+  "nameY": {
+    "type": "number",
+    "label": "Nombre: posición vertical (% del alto)",
+    "value": 50,
+    "group": "Posición"
+  },
+  "nameW": {
+    "type": "number",
+    "label": "Nombre: ancho máximo (% del ancho)",
+    "value": 62,
+    "group": "Posición"
+  },
+  "amountX": {
+    "type": "number",
+    "label": "Monto: posición horizontal (%)",
+    "value": 58,
+    "group": "Posición"
+  },
+  "amountY": {
+    "type": "number",
+    "label": "Monto: posición vertical (%)",
+    "value": 80,
+    "group": "Posición"
+  },
+  "showMessage": {
+    "type": "dropdown",
+    "label": "Mostrar mensaje del usuario",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Mensaje"
+  },
+  "messageSize": {
+    "type": "number",
+    "label": "Tamaño del mensaje (px)",
+    "value": 22,
+    "group": "Mensaje"
+  },
+  "messageColor": {
+    "type": "colorpicker",
+    "label": "Color del mensaje",
+    "value": "#EFE3D3",
+    "group": "Mensaje"
+  },
+  "followOn": {
+    "type": "dropdown",
+    "label": "Activar Follow",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Follow"
+  },
+  "followMedia": {
+    "type": "video-input",
+    "label": "Follow: imagen o video (WebM con transparencia)",
+    "value": "",
+    "group": "Follow"
+  },
+  "followSound": {
+    "type": "sound-input",
+    "label": "Follow: sonido",
+    "value": "",
+    "group": "Follow"
+  },
+  "followAmount": {
+    "type": "dropdown",
+    "label": "Follow: mostrar monto",
+    "value": "no",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Follow"
+  },
+  "subOn": {
+    "type": "dropdown",
+    "label": "Activar Sub",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Sub"
+  },
+  "subMedia": {
+    "type": "video-input",
+    "label": "Sub: imagen o video (WebM con transparencia)",
+    "value": "",
+    "group": "Sub"
+  },
+  "subSound": {
+    "type": "sound-input",
+    "label": "Sub: sonido",
+    "value": "",
+    "group": "Sub"
+  },
+  "subAmount": {
+    "type": "dropdown",
+    "label": "Sub: mostrar monto",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Sub"
+  },
+  "subPrefix": {
+    "type": "text",
+    "label": "Sub: antes del monto",
+    "value": "",
+    "group": "Sub"
+  },
+  "subSuffix": {
+    "type": "text",
+    "label": "Sub: después del monto",
+    "value": " meses",
+    "group": "Sub"
+  },
+  "tipOn": {
+    "type": "dropdown",
+    "label": "Activar Donación",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Donación"
+  },
+  "tipMedia": {
+    "type": "video-input",
+    "label": "Donación: imagen o video (WebM con transparencia)",
+    "value": "",
+    "group": "Donación"
+  },
+  "tipSound": {
+    "type": "sound-input",
+    "label": "Donación: sonido",
+    "value": "",
+    "group": "Donación"
+  },
+  "tipAmount": {
+    "type": "dropdown",
+    "label": "Donación: mostrar monto",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Donación"
+  },
+  "tipPrefix": {
+    "type": "text",
+    "label": "Donación: antes del monto",
+    "value": "$",
+    "group": "Donación"
+  },
+  "tipSuffix": {
+    "type": "text",
+    "label": "Donación: después del monto",
+    "value": "",
+    "group": "Donación"
+  },
+  "tipMin": {
+    "type": "number",
+    "label": "Donación: mínimo para mostrar",
+    "value": 1,
+    "group": "Donación"
+  },
+  "cheerOn": {
+    "type": "dropdown",
+    "label": "Activar Bits",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Bits"
+  },
+  "cheerMedia": {
+    "type": "video-input",
+    "label": "Bits: imagen o video (WebM con transparencia)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerSound": {
+    "type": "sound-input",
+    "label": "Bits: sonido",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerAmount": {
+    "type": "dropdown",
+    "label": "Bits: mostrar monto",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Bits"
+  },
+  "cheerPrefix": {
+    "type": "text",
+    "label": "Bits: antes del monto",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerSuffix": {
+    "type": "text",
+    "label": "Bits: después del monto",
+    "value": " bits",
+    "group": "Bits"
+  },
+  "cheerMin": {
+    "type": "number",
+    "label": "Bits: mínimo para mostrar",
+    "value": 1,
+    "group": "Bits"
+  },
+  "raidOn": {
+    "type": "dropdown",
+    "label": "Activar Raid",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Raid"
+  },
+  "raidMedia": {
+    "type": "video-input",
+    "label": "Raid: imagen o video (WebM con transparencia)",
+    "value": "",
+    "group": "Raid"
+  },
+  "raidSound": {
+    "type": "sound-input",
+    "label": "Raid: sonido",
+    "value": "",
+    "group": "Raid"
+  },
+  "raidAmount": {
+    "type": "dropdown",
+    "label": "Raid: mostrar monto",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Raid"
+  },
+  "raidPrefix": {
+    "type": "text",
+    "label": "Raid: antes del monto",
+    "value": "",
+    "group": "Raid"
+  },
+  "raidSuffix": {
+    "type": "text",
+    "label": "Raid: después del monto",
+    "value": " raiders",
+    "group": "Raid"
+  },
+  "raidMin": {
+    "type": "number",
+    "label": "Raid: mínimo para mostrar",
+    "value": 1,
+    "group": "Raid"
+  }
+}

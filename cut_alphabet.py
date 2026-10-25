@@ -5,7 +5,7 @@ cut_alphabet.py - Corta las hojas del alfabeto de plastilina en letras sueltas.
 Uso:
   python cut_alphabet.py hojas glyphs
 
-  hojas/   upper_1, upper_2, upper_3, lower_1, lower_2, lower_3, digits, symbols
+  hojas/   upper_1, upper_2, upper_3, lower_1, lower_2, lower_3, digits, symbols, extra
            (.png o .jpg). Variantes opcionales: upper_1_v2.png, upper_1_v3.png...
   glyphs/  salida: un PNG transparente por carácter + glyphs.json con las medidas
 
@@ -40,12 +40,15 @@ SHEETS = {
     "lower_3": "stuvwxyz",
     "digits":  "012345678",
     "symbols": "9_.!?-@&#",
+    "extra":   "$%Ññ,:()+",
 }
 DESCENDERS = set("gjpqy_")          # no cuentan para calcular la línea base
-NOT_BASE = DESCENDERS | set(".-@")  # tampoco estos (punto y guion no marcan la base)
+NOT_BASE = DESCENDERS | set(".-@,:()+")  # tampoco estos (punto y guion no marcan la base)
 XHEIGHT = set("acemnorsuvwxz")      # minúsculas sin ascendente ni descendente
 FILENAMES = {"_": "underscore", ".": "period", "!": "exclam", "?": "question",
-             "-": "hyphen", "@": "at", "&": "amp", "#": "hash"}
+             "-": "hyphen", "@": "at", "&": "amp", "#": "hash",
+             "$": "dollar", "%": "percent", "Ñ": "U_enye", "ñ": "L_enye", ",": "comma",
+             ":": "colon", "(": "lparen", ")": "rparen", "+": "plus"}
 
 
 def glyph_name(ch):
@@ -130,6 +133,10 @@ def cut_sheet(path, chars):
         if not ids:
             print(f"  [aviso] {path.name}: no encontré '{ch}' en la celda {idx + 1}")
             continue
+        # alto de la pieza más grande (la letra sin tilde ni punto)
+        biggest = max(ids, key=lambda j: int((lab == j).sum()))
+        ys_b = np.where((lab == biggest).any(1))[0]
+        body_h = int(ys_b.max() - ys_b.min() + 1)
         mask = np.isin(lab, ids)
         mask = ndi.binary_dilation(mask, iterations=3)
         ys, xs = np.where(mask)
@@ -137,7 +144,7 @@ def cut_sheet(path, chars):
         g_a = (alpha * mask)[y0:y1, x0:x1]
         g_rgb = rgb[y0:y1, x0:x1]
         out.append({"ch": ch, "row": idx // 3, "rgba": np.dstack([g_rgb, g_a * 255]),
-                    "top": y0, "bottom": y1, "h": y1 - y0})
+                    "top": y0, "bottom": y1, "h": y1 - y0, "body_h": body_h})
     return out
 
 
@@ -167,7 +174,7 @@ def main(src, dst):
     files = sorted(p for p in src.iterdir() if p.suffix.lower() in (".png", ".jpg", ".jpeg"))
     groups = {}
     for p in files:
-        m = re.fullmatch(r"(upper_[123]|lower_[123]|digits|symbols)(?:_v(\d+))?", p.stem)
+        m = re.fullmatch(r"(upper_[123]|lower_[123]|digits|symbols|extra)(?:_v(\d+))?", p.stem)
         if not m:
             print(f"[salto] {p.name}: nombre no reconocido")
             continue
@@ -201,8 +208,10 @@ def main(src, dst):
             ref, target = median_h(gl, lambda c: True), CAP * DIGIT
         elif key.startswith("lower"):
             ref, target = median_h(gl, lambda c: c in XHEIGHT), XH
-        else:  # symbols: el 9 manda
+        elif key == "symbols":  # el 9 manda
             ref, target = median_h(gl, lambda c: c == "9"), CAP * DIGIT
+        else:                   # extra: el % manda (mide lo mismo que un número)
+            ref, target = median_h(gl, lambda c: c == "%"), CAP * DIGIT
         scale = target / ref
 
         # línea base por fila: mediana del borde inferior de las letras que no bajan
@@ -214,13 +223,19 @@ def main(src, dst):
             base[0] = None
 
         for g in gl:
+            # en la hoja extra, Ñ y ñ se igualan por su cuerpo (sin la tilde) a N y n
+            g_scale = scale
+            if key == "extra" and g["ch"] == "Ñ":
+                g_scale = CAP / g["body_h"]
+            elif key == "extra" and g["ch"] == "ñ":
+                g_scale = XH / g["body_h"]
             b = base.get(g["row"])
             if b is None:  # fila sin referencia (raro): usar el borde inferior propio
                 b = g["bottom"]
-            drop = (g["bottom"] - b) * scale
+            drop = (g["bottom"] - b) * g_scale
             im = Image.fromarray(normalize_light(g["rgba"]), "RGBA")
-            w = max(1, round(im.width * scale))
-            h = max(1, round(im.height * scale))
+            w = max(1, round(im.width * g_scale))
+            h = max(1, round(im.height * g_scale))
             im = im.resize((w, h), Image.LANCZOS)
             name = f"{glyph_name(g['ch'])}" + (f"_v{var}" if var > 1 else "")
             im.save(dst / f"{name}.png", optimize=True)
@@ -234,7 +249,10 @@ def main(src, dst):
         f.write("window.CLAY_GLYPHS = " + json.dumps(manifest, ensure_ascii=False) + ";\n")
 
     found = "".join(sorted(manifest["glyphs"]))
-    missing = [c for c in "".join(SHEETS.values()) if c not in manifest["glyphs"]]
+    missing = [c for k, v in SHEETS.items() if k in groups for c in v if c not in manifest["glyphs"]]
+    skipped = [k for k in SHEETS if k not in groups]
+    if skipped:
+        print("Hojas que no encontré (opcionales si es 'extra'): " + ", ".join(skipped))
     print(f"\nListo: {len(manifest['glyphs'])} caracteres en {dst}")
     print("Faltan: " + ("".join(missing) if missing else "ninguno"))
 
