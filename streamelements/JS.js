@@ -1,5 +1,10 @@
-// Alertas con letras de plastilina para StreamElements (Custom Widget).
+// Alertas con letras de plastilina para StreamElements (Custom Widget) — v6
+// Este archivo trae TODO: el HTML y el CSS se crean desde aquí.
+// Las pestañas HTML y CSS del editor pueden quedar vacías.
 // Todo se configura en el panel de la izquierda (campos); aquí no hay que tocar nada.
+const VERSION = "clay-alerts v6";
+// valores por defecto, por si algún campo no existe todavía en tu panel
+const DEF = {"alertWidth": 700, "duration": 6, "volume": 50, "nameColor": "cocoa", "nameSize": 60, "amountColor": "red", "amountSize": 44, "amountGap": 6, "jitter": 1, "showMessage": "yes", "messageSize": 24, "messageColor": "#EFE3D3", "messageStrokeColor": "#5B4743", "messageStroke": 6, "messageAlign": "center", "dialogWidth": 80, "dialogLeft": 18, "dialogGap": 4, "typeSpeed": 35, "maxChars": 300, "followOn": "yes", "followAmount": "no", "followNameX": 58, "followNameY": 50, "followNameW": 62, "subOn": "yes", "subAmount": "yes", "subDialog": "yes", "subNameX": 58, "subNameY": 50, "subNameW": 62, "subPrefix": "", "subSuffix": " meses", "subSuffixOne": " mes", "tipOn": "yes", "tipAmount": "yes", "tipDialog": "yes", "tipNameX": 58, "tipNameY": 50, "tipNameW": 62, "tipPrefix": "$", "tipSuffix": "", "tipMin": 1, "cheerOn": "yes", "cheerAmount": "yes", "cheerDialog": "yes", "cheerNameX": 58, "cheerNameY": 50, "cheerNameW": 62, "cheerPrefix": "", "cheerSuffix": " bits", "cheerSuffixOne": " bit", "cheerMin": 1, "raidOn": "yes", "raidAmount": "yes", "raidNameX": 58, "raidNameY": 50, "raidNameW": 62, "raidPrefix": "", "raidSuffix": " raiders", "raidSuffixOne": " raider", "raidMin": 1};
 let F = {};
 const queue = [];
 let busy = false;
@@ -12,8 +17,64 @@ const EVENTS = {
   "raid-latest":       "raid",
 };
 
+function buildPage() {
+  const style = document.createElement("style");
+  style.textContent = `@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap");
+html, body { margin: 0; background: transparent; overflow: hidden; }
+#stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+#alert {
+  position: relative; width: ${F.alertWidth}px; opacity: 0; transform: translateY(40px);
+  transition: opacity .25s steps(3), transform .35s steps(4);
+}
+#alert.show { opacity: 1; transform: none; }
+/* sin imagen la alerta igual tiene alto, para que el texto no se amontone arriba */
+#alert:not(.has-media) { aspect-ratio: 3 / 1; }
+#media-img, #media-vid { display: none; width: 100%; height: auto; }
+#label-box {
+  position: absolute; left: var(--nx); top: var(--ny); width: var(--nw);
+  transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: ${F.amountGap}px;
+}
+#label-box > div { display: flex !important; justify-content: center; position: static !important; }
+#clay-amount:empty { display: none !important; }
+
+/* ---- mensaje: texto suelto debajo de la placa, sin caja ---- */
+#dialog {
+  position: absolute; top: calc(100% + ${F.dialogGap}px); left: ${F.dialogLeft}%; width: ${F.dialogWidth}%;
+  opacity: 0; transition: opacity .15s steps(2);
+}
+#dialog.open { opacity: 1; }
+#dialog-inner { overflow: hidden; height: 0; transition: height .12s steps(2); }
+#dialog-text {
+  font: 600 ${F.messageSize}px/1.35 "Fredoka", sans-serif; color: ${F.messageColor};
+  text-align: ${F.messageAlign}; overflow-wrap: anywhere;
+  /* contorno del mismo café que los marcos + sombra, para leerse sobre cualquier fondo */
+  -webkit-text-stroke: ${F.messageStroke}px ${F.messageStrokeColor}; paint-order: stroke fill;
+  text-shadow: 0 3px 0 ${F.messageStrokeColor}, 0 6px 10px rgba(0,0,0,.35);
+  padding-bottom: 8px;
+}
+#dialog-text img { height: 1.3em; vertical-align: -0.3em; }
+`;
+  document.head.appendChild(style);
+  document.body.innerHTML = `<div id="stage">
+  <div id="alert">
+    <img id="media-img" alt="">
+    <video id="media-vid" muted playsinline></video>
+    <div id="label-box">
+      <div id="clay-name"></div>
+      <div id="clay-amount"></div>
+    </div>
+    <div id="dialog"><div id="dialog-inner"><div id="dialog-text"></div></div></div>
+  </div>
+</div>
+<audio id="sound"></audio>`;
+  console.log(VERSION);
+}
+
 window.addEventListener("onWidgetLoad", (obj) => {
-  F = obj.detail.fieldData;
+  F = Object.assign({}, DEF, obj.detail.fieldData);
+  for (const k in DEF) if (F[k] === "" || F[k] === undefined || F[k] === null) F[k] = DEF[k];
+  buildPage();
   const base = (F.baseUrl || "").replace(/\/?$/, "/");
   const s = document.createElement("script");
   s.src = base + "clay_text.js";
