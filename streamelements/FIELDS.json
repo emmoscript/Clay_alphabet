@@ -7,8 +7,8 @@
   },
   "alertWidth": {
     "type": "number",
-    "label": "Ancho de la alerta (px)",
-    "value": 700,
+    "label": "Ancho total de la alerta (personaje + placa, px)",
+    "value": 760,
     "group": "General"
   },
   "duration": {
@@ -24,6 +24,160 @@
     "min": 0,
     "max": 100,
     "step": 1,
+    "group": "General"
+  },
+  "anchor": {
+    "type": "dropdown",
+    "label": "La alerta crece desde",
+    "value": "bottom",
+    "options": {
+      "bottom": "Abajo (crece hacia arriba)",
+      "center": "Centro",
+      "top": "Arriba (crece hacia abajo)"
+    },
+    "group": "General"
+  },
+  "shadowOpacity": {
+    "type": "slider",
+    "label": "Sombra: intensidad",
+    "value": 0.35,
+    "min": 0,
+    "max": 1,
+    "step": 0.05,
+    "group": "General"
+  },
+  "shadowBlur": {
+    "type": "number",
+    "label": "Sombra: difuminado (px)",
+    "value": 14,
+    "group": "General"
+  },
+  "shadowY": {
+    "type": "number",
+    "label": "Sombra: distancia hacia abajo (px)",
+    "value": 10,
+    "group": "General"
+  },
+  "plateS": {
+    "type": "image-input",
+    "label": "Placa pequeña (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Placa"
+  },
+  "plateM": {
+    "type": "image-input",
+    "label": "Placa mediana (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Placa"
+  },
+  "plateL": {
+    "type": "image-input",
+    "label": "Placa grande (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Placa"
+  },
+  "useDrawnPlate": {
+    "type": "dropdown",
+    "label": "Usar placa dibujada en vez de imagen",
+    "value": "no",
+    "options": {
+      "no": "No",
+      "yes": "Sí"
+    },
+    "group": "Placa"
+  },
+  "platePadX": {
+    "type": "number",
+    "label": "Margen interno a los lados (px)",
+    "value": 20,
+    "group": "Placa"
+  },
+  "platePadY": {
+    "type": "number",
+    "label": "Margen interno arriba/abajo (px)",
+    "value": 6,
+    "group": "Placa"
+  },
+  "charWidth": {
+    "type": "number",
+    "label": "Ancho del personaje (px)",
+    "value": 150,
+    "group": "Personaje y etiqueta"
+  },
+  "charOverlap": {
+    "type": "number",
+    "label": "Cuánto se mete el personaje sobre la placa (px)",
+    "value": 20,
+    "group": "Personaje y etiqueta"
+  },
+  "badgeHeight": {
+    "type": "number",
+    "label": "Alto de la etiqueta (px)",
+    "value": 100,
+    "group": "Personaje y etiqueta"
+  },
+  "badgeSpot": {
+    "type": "dropdown",
+    "label": "Dónde va la etiqueta",
+    "value": "bottom-right",
+    "options": {
+      "top-left": "Arriba a la izquierda",
+      "top-center": "Arriba al centro",
+      "top-right": "Arriba a la derecha",
+      "bottom-right": "Abajo a la derecha",
+      "bottom-left": "Abajo a la izquierda"
+    },
+    "group": "Personaje y etiqueta"
+  },
+  "badgeBalance": {
+    "type": "dropdown",
+    "label": "Equilibrar la etiqueta sobre la esquina (sale lo mismo por el lado y por abajo)",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Personaje y etiqueta"
+  },
+  "badgeDX": {
+    "type": "number",
+    "label": "Etiqueta: mover a los lados (px)",
+    "value": 0,
+    "group": "Personaje y etiqueta"
+  },
+  "badgeDY": {
+    "type": "number",
+    "label": "Etiqueta: mover arriba/abajo (px)",
+    "value": 0,
+    "group": "Personaje y etiqueta"
+  },
+  "badgeRotate": {
+    "type": "number",
+    "label": "Etiqueta: giro (grados)",
+    "value": -8,
+    "group": "Personaje y etiqueta"
+  },
+  "showBadges": {
+    "type": "dropdown",
+    "label": "Mostrar etiquetas (NEW FOLLOWER, etc.)",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Personaje y etiqueta"
+  },
+  "language": {
+    "type": "dropdown",
+    "label": "Idioma de las frases de agradecimiento",
+    "value": "mix",
+    "options": {
+      "es": "Español",
+      "en": "Inglés",
+      "spanglish": "Spanglish",
+      "mix": "Mezcla (cambia en cada alerta)",
+      "off": "Sin frase"
+    },
     "group": "General"
   },
   "nameColor": {
@@ -102,7 +256,19 @@
   "messageColor": {
     "type": "colorpicker",
     "label": "Color del texto",
-    "value": "#EFE3D3",
+    "value": "#5B4743",
+    "group": "Mensaje"
+  },
+  "thanksColor": {
+    "type": "colorpicker",
+    "label": "Color de la frase de agradecimiento",
+    "value": "#E8322B",
+    "group": "Mensaje"
+  },
+  "thanksSize": {
+    "type": "number",
+    "label": "Tamaño de la frase de agradecimiento (px)",
+    "value": 24,
     "group": "Mensaje"
   },
   "messageStrokeColor": {
@@ -114,7 +280,7 @@
   "messageStroke": {
     "type": "number",
     "label": "Grosor del contorno (px)",
-    "value": 6,
+    "value": 0,
     "group": "Mensaje"
   },
   "messageAlign": {
@@ -127,22 +293,10 @@
     },
     "group": "Mensaje"
   },
-  "dialogWidth": {
-    "type": "number",
-    "label": "Ancho del mensaje (% del ancho de la alerta)",
-    "value": 80,
-    "group": "Mensaje"
-  },
-  "dialogLeft": {
-    "type": "number",
-    "label": "Posición horizontal del mensaje (%)",
-    "value": 18,
-    "group": "Mensaje"
-  },
   "dialogGap": {
     "type": "number",
-    "label": "Separación debajo de la placa (px)",
-    "value": 4,
+    "label": "Espacio entre el nombre y el texto (px)",
+    "value": 8,
     "group": "Mensaje"
   },
   "typeSpeed": {
@@ -169,7 +323,37 @@
   },
   "followMedia": {
     "type": "video-input",
-    "label": "Follow: imagen o video (WebM con transparencia)",
+    "label": "Follow: personaje (imagen o WebM transparente)",
+    "value": "",
+    "group": "Follow"
+  },
+  "followBadge": {
+    "type": "image-input",
+    "label": "Follow: etiqueta (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Follow"
+  },
+  "followBadgeDX": {
+    "type": "number",
+    "label": "Follow: mover etiqueta a los lados (px, negativo = izquierda)",
+    "value": 0,
+    "group": "Follow"
+  },
+  "followBadgeDY": {
+    "type": "number",
+    "label": "Follow: mover etiqueta arriba/abajo (px, negativo = arriba)",
+    "value": 0,
+    "group": "Follow"
+  },
+  "followBadgeRot": {
+    "type": "text",
+    "label": "Follow: giro propio de la etiqueta (grados, vacío = el general)",
+    "value": "",
+    "group": "Follow"
+  },
+  "followPlate": {
+    "type": "image-input",
+    "label": "Follow: placa propia (vacío = la general)",
     "value": "",
     "group": "Follow"
   },
@@ -189,22 +373,32 @@
     },
     "group": "Follow"
   },
-  "followNameX": {
-    "type": "number",
-    "label": "Follow: texto (nombre + monto), posición horizontal (% del ancho)",
-    "value": 58,
+  "followThanksOn": {
+    "type": "dropdown",
+    "label": "Follow: mostrar frase de agradecimiento",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
     "group": "Follow"
   },
-  "followNameY": {
-    "type": "number",
-    "label": "Follow: texto (nombre + monto), posición vertical (% del alto)",
-    "value": 50,
+  "followThanks_es": {
+    "type": "text",
+    "label": "Follow: frases en español (separa con | )",
+    "value": "¡Gracias por el follow!",
     "group": "Follow"
   },
-  "followNameW": {
-    "type": "number",
-    "label": "Follow: texto, ancho máximo (% del ancho)",
-    "value": 62,
+  "followThanks_en": {
+    "type": "text",
+    "label": "Follow: frases en inglés (separa con | )",
+    "value": "Thank you for the follow!",
+    "group": "Follow"
+  },
+  "followThanks_spanglish": {
+    "type": "text",
+    "label": "Follow: frases en spanglish (separa con | )",
+    "value": "¡Thank you por el follow!",
     "group": "Follow"
   },
   "subOn": {
@@ -219,7 +413,43 @@
   },
   "subMedia": {
     "type": "video-input",
-    "label": "Sub: imagen o video (WebM con transparencia)",
+    "label": "Sub: personaje (imagen o WebM transparente)",
+    "value": "",
+    "group": "Sub"
+  },
+  "subBadge": {
+    "type": "image-input",
+    "label": "Sub: etiqueta (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Sub"
+  },
+  "subBadgeDX": {
+    "type": "number",
+    "label": "Sub: mover etiqueta a los lados (px, negativo = izquierda)",
+    "value": 0,
+    "group": "Sub"
+  },
+  "subBadgeDY": {
+    "type": "number",
+    "label": "Sub: mover etiqueta arriba/abajo (px, negativo = arriba)",
+    "value": 0,
+    "group": "Sub"
+  },
+  "subBadgeRot": {
+    "type": "text",
+    "label": "Sub: giro propio de la etiqueta (grados, vacío = el general)",
+    "value": "",
+    "group": "Sub"
+  },
+  "subGiftBadge": {
+    "type": "image-input",
+    "label": "Sub regalado: etiqueta (vacío = GIFT SUB de tu carpeta)",
+    "value": "",
+    "group": "Sub"
+  },
+  "subPlate": {
+    "type": "image-input",
+    "label": "Sub: placa propia (vacío = la general)",
     "value": "",
     "group": "Sub"
   },
@@ -239,6 +469,52 @@
     },
     "group": "Sub"
   },
+  "subThanksOn": {
+    "type": "dropdown",
+    "label": "Sub: mostrar frase de agradecimiento",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Sub"
+  },
+  "subThanks_es": {
+    "type": "text",
+    "label": "Sub: frases en español (separa con | )",
+    "value": "¡Gracias por {meses} de sub!",
+    "group": "Sub"
+  },
+  "subThanks_en": {
+    "type": "text",
+    "label": "Sub: frases en inglés (separa con | )",
+    "value": "Thank you for {months} of sub!",
+    "group": "Sub"
+  },
+  "subThanks_spanglish": {
+    "type": "text",
+    "label": "Sub: frases en spanglish (separa con | )",
+    "value": "¡Thank you por {meses} de sub!",
+    "group": "Sub"
+  },
+  "subGiftThanks_es": {
+    "type": "text",
+    "label": "Sub regalado: frases en español ({sender} = quien regala)",
+    "value": "¡{sender} le regaló un sub!",
+    "group": "Sub"
+  },
+  "subGiftThanks_en": {
+    "type": "text",
+    "label": "Sub regalado: frases en inglés",
+    "value": "{sender} gifted a sub!",
+    "group": "Sub"
+  },
+  "subGiftThanks_spanglish": {
+    "type": "text",
+    "label": "Sub regalado: frases en spanglish",
+    "value": "¡{sender} gifted un sub!",
+    "group": "Sub"
+  },
   "subDialog": {
     "type": "dropdown",
     "label": "Sub: mostrar mensaje",
@@ -247,24 +523,6 @@
       "yes": "Sí",
       "no": "No"
     },
-    "group": "Sub"
-  },
-  "subNameX": {
-    "type": "number",
-    "label": "Sub: texto (nombre + monto), posición horizontal (% del ancho)",
-    "value": 58,
-    "group": "Sub"
-  },
-  "subNameY": {
-    "type": "number",
-    "label": "Sub: texto (nombre + monto), posición vertical (% del alto)",
-    "value": 50,
-    "group": "Sub"
-  },
-  "subNameW": {
-    "type": "number",
-    "label": "Sub: texto, ancho máximo (% del ancho)",
-    "value": 62,
     "group": "Sub"
   },
   "subPrefix": {
@@ -297,7 +555,37 @@
   },
   "tipMedia": {
     "type": "video-input",
-    "label": "Donación: imagen o video (WebM con transparencia)",
+    "label": "Donación: personaje (imagen o WebM transparente)",
+    "value": "",
+    "group": "Donación"
+  },
+  "tipBadge": {
+    "type": "image-input",
+    "label": "Donación: etiqueta (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Donación"
+  },
+  "tipBadgeDX": {
+    "type": "number",
+    "label": "Donación: mover etiqueta a los lados (px, negativo = izquierda)",
+    "value": 0,
+    "group": "Donación"
+  },
+  "tipBadgeDY": {
+    "type": "number",
+    "label": "Donación: mover etiqueta arriba/abajo (px, negativo = arriba)",
+    "value": 0,
+    "group": "Donación"
+  },
+  "tipBadgeRot": {
+    "type": "text",
+    "label": "Donación: giro propio de la etiqueta (grados, vacío = el general)",
+    "value": "-13",
+    "group": "Donación"
+  },
+  "tipPlate": {
+    "type": "image-input",
+    "label": "Donación: placa propia (vacío = la general)",
     "value": "",
     "group": "Donación"
   },
@@ -317,6 +605,34 @@
     },
     "group": "Donación"
   },
+  "tipThanksOn": {
+    "type": "dropdown",
+    "label": "Donación: mostrar frase de agradecimiento",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Donación"
+  },
+  "tipThanks_es": {
+    "type": "text",
+    "label": "Donación: frases en español (separa con | )",
+    "value": "¡Gracias por el apoyo!",
+    "group": "Donación"
+  },
+  "tipThanks_en": {
+    "type": "text",
+    "label": "Donación: frases en inglés (separa con | )",
+    "value": "Thank you for the support!",
+    "group": "Donación"
+  },
+  "tipThanks_spanglish": {
+    "type": "text",
+    "label": "Donación: frases en spanglish (separa con | )",
+    "value": "¡Thank you por el apoyo!",
+    "group": "Donación"
+  },
   "tipDialog": {
     "type": "dropdown",
     "label": "Donación: mostrar mensaje",
@@ -325,24 +641,6 @@
       "yes": "Sí",
       "no": "No"
     },
-    "group": "Donación"
-  },
-  "tipNameX": {
-    "type": "number",
-    "label": "Donación: texto (nombre + monto), posición horizontal (% del ancho)",
-    "value": 58,
-    "group": "Donación"
-  },
-  "tipNameY": {
-    "type": "number",
-    "label": "Donación: texto (nombre + monto), posición vertical (% del alto)",
-    "value": 50,
-    "group": "Donación"
-  },
-  "tipNameW": {
-    "type": "number",
-    "label": "Donación: texto, ancho máximo (% del ancho)",
-    "value": 62,
     "group": "Donación"
   },
   "tipPrefix": {
@@ -375,7 +673,37 @@
   },
   "cheerMedia": {
     "type": "video-input",
-    "label": "Bits: imagen o video (WebM con transparencia)",
+    "label": "Bits: personaje (imagen o WebM transparente)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerBadge": {
+    "type": "image-input",
+    "label": "Bits: etiqueta (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerBadgeDX": {
+    "type": "number",
+    "label": "Bits: mover etiqueta a los lados (px, negativo = izquierda)",
+    "value": 0,
+    "group": "Bits"
+  },
+  "cheerBadgeDY": {
+    "type": "number",
+    "label": "Bits: mover etiqueta arriba/abajo (px, negativo = arriba)",
+    "value": 0,
+    "group": "Bits"
+  },
+  "cheerBadgeRot": {
+    "type": "text",
+    "label": "Bits: giro propio de la etiqueta (grados, vacío = el general)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerPlate": {
+    "type": "image-input",
+    "label": "Bits: placa propia (vacío = la general)",
     "value": "",
     "group": "Bits"
   },
@@ -395,6 +723,80 @@
     },
     "group": "Bits"
   },
+  "cheerThanksOn": {
+    "type": "dropdown",
+    "label": "Bits: mostrar frase de agradecimiento",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Bits"
+  },
+  "cheerThanks_es": {
+    "type": "text",
+    "label": "Bits: frases en español (separa con | )",
+    "value": "¡Gracias por los {bits}!",
+    "group": "Bits"
+  },
+  "cheerThanks_en": {
+    "type": "text",
+    "label": "Bits: frases en inglés (separa con | )",
+    "value": "Thank you for the {bits}!",
+    "group": "Bits"
+  },
+  "cheerThanks_spanglish": {
+    "type": "text",
+    "label": "Bits: frases en spanglish (separa con | )",
+    "value": "¡Thank you por los {bits}!",
+    "group": "Bits"
+  },
+  "cheerGem": {
+    "type": "dropdown",
+    "label": "Bits: gema de Twitch delante del monto",
+    "value": "no",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Bits"
+  },
+  "cheerGem1": {
+    "type": "image-input",
+    "label": "Bits: gema para 1–99 (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerGem100": {
+    "type": "image-input",
+    "label": "Bits: gema para 100–999 (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerGem1000": {
+    "type": "image-input",
+    "label": "Bits: gema para 1000–4999 (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerGem5000": {
+    "type": "image-input",
+    "label": "Bits: gema para 5000–9999 (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerGem10000": {
+    "type": "image-input",
+    "label": "Bits: gema para 10000–99999 (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Bits"
+  },
+  "cheerGem100000": {
+    "type": "image-input",
+    "label": "Bits: gema para 100000+ (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Bits"
+  },
   "cheerDialog": {
     "type": "dropdown",
     "label": "Bits: mostrar mensaje",
@@ -403,24 +805,6 @@
       "yes": "Sí",
       "no": "No"
     },
-    "group": "Bits"
-  },
-  "cheerNameX": {
-    "type": "number",
-    "label": "Bits: texto (nombre + monto), posición horizontal (% del ancho)",
-    "value": 58,
-    "group": "Bits"
-  },
-  "cheerNameY": {
-    "type": "number",
-    "label": "Bits: texto (nombre + monto), posición vertical (% del alto)",
-    "value": 50,
-    "group": "Bits"
-  },
-  "cheerNameW": {
-    "type": "number",
-    "label": "Bits: texto, ancho máximo (% del ancho)",
-    "value": 62,
     "group": "Bits"
   },
   "cheerPrefix": {
@@ -459,7 +843,37 @@
   },
   "raidMedia": {
     "type": "video-input",
-    "label": "Raid: imagen o video (WebM con transparencia)",
+    "label": "Raid: personaje (imagen o WebM transparente)",
+    "value": "",
+    "group": "Raid"
+  },
+  "raidBadge": {
+    "type": "image-input",
+    "label": "Raid: etiqueta (vacío = la de tu carpeta)",
+    "value": "",
+    "group": "Raid"
+  },
+  "raidBadgeDX": {
+    "type": "number",
+    "label": "Raid: mover etiqueta a los lados (px, negativo = izquierda)",
+    "value": 0,
+    "group": "Raid"
+  },
+  "raidBadgeDY": {
+    "type": "number",
+    "label": "Raid: mover etiqueta arriba/abajo (px, negativo = arriba)",
+    "value": 0,
+    "group": "Raid"
+  },
+  "raidBadgeRot": {
+    "type": "text",
+    "label": "Raid: giro propio de la etiqueta (grados, vacío = el general)",
+    "value": "",
+    "group": "Raid"
+  },
+  "raidPlate": {
+    "type": "image-input",
+    "label": "Raid: placa propia (vacío = la general)",
     "value": "",
     "group": "Raid"
   },
@@ -479,22 +893,32 @@
     },
     "group": "Raid"
   },
-  "raidNameX": {
-    "type": "number",
-    "label": "Raid: texto (nombre + monto), posición horizontal (% del ancho)",
-    "value": 58,
+  "raidThanksOn": {
+    "type": "dropdown",
+    "label": "Raid: mostrar frase de agradecimiento",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
     "group": "Raid"
   },
-  "raidNameY": {
-    "type": "number",
-    "label": "Raid: texto (nombre + monto), posición vertical (% del alto)",
-    "value": 50,
+  "raidThanks_es": {
+    "type": "text",
+    "label": "Raid: frases en español (separa con | )",
+    "value": "¡Gracias por el raid!",
     "group": "Raid"
   },
-  "raidNameW": {
-    "type": "number",
-    "label": "Raid: texto, ancho máximo (% del ancho)",
-    "value": 62,
+  "raidThanks_en": {
+    "type": "text",
+    "label": "Raid: frases en inglés (separa con | )",
+    "value": "Thank you for the raid!",
+    "group": "Raid"
+  },
+  "raidThanks_spanglish": {
+    "type": "text",
+    "label": "Raid: frases en spanglish (separa con | )",
+    "value": "¡Thank you por el raid!",
     "group": "Raid"
   },
   "raidPrefix": {

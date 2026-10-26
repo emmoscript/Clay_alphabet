@@ -1,1 +1,64 @@
-/* vacío a propósito: los estilos vienen dentro de la pestaña JS */
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap");
+html, body { margin: 0; background: transparent; overflow: hidden; }
+#stage { position: absolute; inset: 0; display: flex; justify-content: center; padding: 40px; box-sizing: border-box; }
+#stage.top { align-items: flex-start; } #stage.center { align-items: center; } #stage.bottom { align-items: flex-end; }
+
+#alert {
+  display: flex; align-items: flex-end; width: {{alertWidth}}px;
+  opacity: 0; transform: translateY(40px);
+  transition: opacity .25s steps(3), transform .35s steps(4);
+}
+#alert.show { opacity: 1; transform: none; }
+/* sombra de toda la alerta (placa + etiqueta + personaje), siempre igual en cualquier OBS */
+#alert { filter: drop-shadow(0 {{shadowY}}px {{shadowBlur}}px rgba(40, 25, 20, {{shadowOpacity}})); }
+
+/* personaje */
+#char { flex: none; width: {{charWidth}}px; margin-right: -{{charOverlap}}px; position: relative; z-index: 2; }
+#char:empty, #char.none { display: none; }
+#char-img, #char-vid { display: none; width: 100%; height: auto; }
+
+/* placa: la imagen se corta en 9 partes; las esquinas no se deforman y el centro se estira */
+#plate {
+  flex: 1; position: relative; box-sizing: border-box;
+  padding: {{platePadY}}px {{platePadX}}px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 30px solid transparent;
+}
+/* sin imagen de placa: una placa dibujada con los colores del pack */
+#plate.drawn {
+  background: #EFE3D3; border: 8px solid #5B4743; border-radius: 40px;
+  box-shadow: inset 4px 4px 0 rgba(255,255,255,.5), inset -5px -6px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.35);
+}
+
+#label-box { display: flex; flex-direction: column; align-items: center; gap: {{amountGap}}px; width: 100%; }
+#label-box > div { display: flex !important; justify-content: center; }
+#clay-amount:empty { display: none !important; }
+
+/* texto debajo del nombre, dentro de la placa */
+#dialog { width: 100%; opacity: 0; transition: opacity .15s steps(2); }
+#dialog.open { opacity: 1; margin-top: {{dialogGap}}px; }
+#dialog-inner { overflow: hidden; height: 0; transition: height .12s steps(2); }
+#dialog-text {
+  font: 600 {{messageSize}}px/1.35 "Fredoka", sans-serif; color: {{messageColor}};
+  text-align: {{messageAlign}}; overflow-wrap: anywhere;
+  -webkit-text-stroke: {{messageStroke}}px {{messageStrokeColor}}; paint-order: stroke fill;
+}
+#dialog-text img { height: 1.3em; vertical-align: -0.3em; }
+#dialog-text .thanks { color: {{thanksColor}}; font-size: {{thanksSize}}px; }
+#dialog-text .user-msg { margin-top: 4px; }
+#dialog-text .cheer { display: inline-flex; align-items: center; gap: .28em; margin: 0 .22em; vertical-align: -0.18em; white-space: nowrap; }
+#dialog-text .cheer img { height: 1em; width: auto; margin: 0; vertical-align: 0; }
+#dialog-text .cheer b { font-weight: 700; line-height: 1; }
+
+/* etiqueta: se coloca desde JS sobre un punto del borde de la placa y cae como un sello */
+#badge {
+  position: absolute; display: none; z-index: 3; height: {{badgeHeight}}px; width: auto;
+  transform: translate(-50%, -50%) rotate(var(--rot, -6deg));
+  filter: drop-shadow(0 6px 6px rgba(0,0,0,.3));
+}
+#badge.stamp { animation: stamp .32s steps(4) both; }
+@keyframes stamp {
+  0%   { transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.6); opacity: 0; }
+  60%  { transform: translate(-50%, -50%) rotate(var(--rot)) scale(.92); opacity: 1; }
+  100% { transform: translate(-50%, -50%) rotate(var(--rot)) scale(1); opacity: 1; }
+}
