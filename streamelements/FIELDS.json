@@ -68,6 +68,12 @@
     "value": 44,
     "group": "Letras"
   },
+  "amountGap": {
+    "type": "number",
+    "label": "Espacio entre nombre y monto (px)",
+    "value": 6,
+    "group": "Letras"
+  },
   "jitter": {
     "type": "slider",
     "label": "Letras torcidas (0 = rectas)",
@@ -185,32 +191,20 @@
   },
   "followNameX": {
     "type": "number",
-    "label": "Follow: nombre, posición horizontal (% del ancho)",
+    "label": "Follow: texto (nombre + monto), posición horizontal (% del ancho)",
     "value": 58,
     "group": "Follow"
   },
   "followNameY": {
     "type": "number",
-    "label": "Follow: nombre, posición vertical (% del alto)",
+    "label": "Follow: texto (nombre + monto), posición vertical (% del alto)",
     "value": 50,
     "group": "Follow"
   },
   "followNameW": {
     "type": "number",
-    "label": "Follow: nombre, ancho máximo (% del ancho)",
+    "label": "Follow: texto, ancho máximo (% del ancho)",
     "value": 62,
-    "group": "Follow"
-  },
-  "followAmountX": {
-    "type": "number",
-    "label": "Follow: monto, posición horizontal (%)",
-    "value": 58,
-    "group": "Follow"
-  },
-  "followAmountY": {
-    "type": "number",
-    "label": "Follow: monto, posición vertical (%)",
-    "value": 70,
     "group": "Follow"
   },
   "subOn": {
@@ -257,32 +251,20 @@
   },
   "subNameX": {
     "type": "number",
-    "label": "Sub: nombre, posición horizontal (% del ancho)",
+    "label": "Sub: texto (nombre + monto), posición horizontal (% del ancho)",
     "value": 58,
     "group": "Sub"
   },
   "subNameY": {
     "type": "number",
-    "label": "Sub: nombre, posición vertical (% del alto)",
-    "value": 42,
+    "label": "Sub: texto (nombre + monto), posición vertical (% del alto)",
+    "value": 50,
     "group": "Sub"
   },
   "subNameW": {
     "type": "number",
-    "label": "Sub: nombre, ancho máximo (% del ancho)",
+    "label": "Sub: texto, ancho máximo (% del ancho)",
     "value": 62,
-    "group": "Sub"
-  },
-  "subAmountX": {
-    "type": "number",
-    "label": "Sub: monto, posición horizontal (%)",
-    "value": 58,
-    "group": "Sub"
-  },
-  "subAmountY": {
-    "type": "number",
-    "label": "Sub: monto, posición vertical (%)",
-    "value": 70,
     "group": "Sub"
   },
   "subPrefix": {
@@ -295,6 +277,12 @@
     "type": "text",
     "label": "Sub: después del monto",
     "value": " meses",
+    "group": "Sub"
+  },
+  "subSuffixOne": {
+    "type": "text",
+    "label": "Sub: después del monto cuando es 1",
+    "value": " mes",
     "group": "Sub"
   },
   "tipOn": {
@@ -341,32 +329,20 @@
   },
   "tipNameX": {
     "type": "number",
-    "label": "Donación: nombre, posición horizontal (% del ancho)",
+    "label": "Donación: texto (nombre + monto), posición horizontal (% del ancho)",
     "value": 58,
     "group": "Donación"
   },
   "tipNameY": {
     "type": "number",
-    "label": "Donación: nombre, posición vertical (% del alto)",
-    "value": 42,
+    "label": "Donación: texto (nombre + monto), posición vertical (% del alto)",
+    "value": 50,
     "group": "Donación"
   },
   "tipNameW": {
     "type": "number",
-    "label": "Donación: nombre, ancho máximo (% del ancho)",
+    "label": "Donación: texto, ancho máximo (% del ancho)",
     "value": 62,
-    "group": "Donación"
-  },
-  "tipAmountX": {
-    "type": "number",
-    "label": "Donación: monto, posición horizontal (%)",
-    "value": 58,
-    "group": "Donación"
-  },
-  "tipAmountY": {
-    "type": "number",
-    "label": "Donación: monto, posición vertical (%)",
-    "value": 70,
     "group": "Donación"
   },
   "tipPrefix": {
@@ -431,32 +407,20 @@
   },
   "cheerNameX": {
     "type": "number",
-    "label": "Bits: nombre, posición horizontal (% del ancho)",
+    "label": "Bits: texto (nombre + monto), posición horizontal (% del ancho)",
     "value": 58,
     "group": "Bits"
   },
   "cheerNameY": {
     "type": "number",
-    "label": "Bits: nombre, posición vertical (% del alto)",
-    "value": 42,
+    "label": "Bits: texto (nombre + monto), posición vertical (% del alto)",
+    "value": 50,
     "group": "Bits"
   },
   "cheerNameW": {
     "type": "number",
-    "label": "Bits: nombre, ancho máximo (% del ancho)",
+    "label": "Bits: texto, ancho máximo (% del ancho)",
     "value": 62,
-    "group": "Bits"
-  },
-  "cheerAmountX": {
-    "type": "number",
-    "label": "Bits: monto, posición horizontal (%)",
-    "value": 58,
-    "group": "Bits"
-  },
-  "cheerAmountY": {
-    "type": "number",
-    "label": "Bits: monto, posición vertical (%)",
-    "value": 70,
     "group": "Bits"
   },
   "cheerPrefix": {
@@ -469,6 +433,12 @@
     "type": "text",
     "label": "Bits: después del monto",
     "value": " bits",
+    "group": "Bits"
+  },
+  "cheerSuffixOne": {
+    "type": "text",
+    "label": "Bits: después del monto cuando es 1",
+    "value": " bit",
     "group": "Bits"
   },
   "cheerMin": {
@@ -511,32 +481,20 @@
   },
   "raidNameX": {
     "type": "number",
-    "label": "Raid: nombre, posición horizontal (% del ancho)",
+    "label": "Raid: texto (nombre + monto), posición horizontal (% del ancho)",
     "value": 58,
     "group": "Raid"
   },
   "raidNameY": {
     "type": "number",
-    "label": "Raid: nombre, posición vertical (% del alto)",
-    "value": 42,
+    "label": "Raid: texto (nombre + monto), posición vertical (% del alto)",
+    "value": 50,
     "group": "Raid"
   },
   "raidNameW": {
     "type": "number",
-    "label": "Raid: nombre, ancho máximo (% del ancho)",
+    "label": "Raid: texto, ancho máximo (% del ancho)",
     "value": 62,
-    "group": "Raid"
-  },
-  "raidAmountX": {
-    "type": "number",
-    "label": "Raid: monto, posición horizontal (%)",
-    "value": 58,
-    "group": "Raid"
-  },
-  "raidAmountY": {
-    "type": "number",
-    "label": "Raid: monto, posición vertical (%)",
-    "value": 70,
     "group": "Raid"
   },
   "raidPrefix": {
@@ -549,6 +507,12 @@
     "type": "text",
     "label": "Raid: después del monto",
     "value": " raiders",
+    "group": "Raid"
+  },
+  "raidSuffixOne": {
+    "type": "text",
+    "label": "Raid: después del monto cuando es 1",
+    "value": " raider",
     "group": "Raid"
   },
   "raidMin": {

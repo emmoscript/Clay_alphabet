@@ -6,13 +6,14 @@ html, body { margin: 0; background: transparent; overflow: hidden; }
   transition: opacity .25s steps(3), transform .35s steps(4);
 }
 #alert.show { opacity: 1; transform: none; }
+/* sin imagen la alerta igual tiene alto, para que el texto no se amontone arriba */
+#alert:not(.has-media) { aspect-ratio: 3 / 1; }
 #media-img, #media-vid { display: none; width: 100%; height: auto; }
-#name-box, #amount-box {
-  position: absolute; display: flex; align-items: center; justify-content: center;
+#label-box {
+  position: absolute; left: var(--nx); top: var(--ny); width: var(--nw);
   transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: {{amountGap}}px;
 }
-#name-box   { left: var(--nx); top: var(--ny); width: var(--nw); }
-#amount-box { left: var(--ax); top: var(--ay); }
 #clay-amount:empty { display: none; }
 
 /* ---- mensaje: texto suelto debajo de la placa, sin caja ---- */

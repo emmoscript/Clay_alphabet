@@ -57,6 +57,7 @@ async function play(type, ev) {
   // 1. limpiar la alerta anterior y esconder todo mientras carga la nueva
   alert.classList.remove("show");
   img.style.display = vid.style.display = "none";
+  alert.classList.toggle("has-media", !!media);
   const nameEl = document.getElementById("clay-name");
   const amountEl = document.getElementById("clay-amount");
   nameEl.innerHTML = amountEl.innerHTML = "";
@@ -78,12 +79,10 @@ async function play(type, ev) {
   alert.style.setProperty("--nx", (+F[type + "NameX"]) + "%");
   alert.style.setProperty("--ny", (+F[type + "NameY"]) + "%");
   alert.style.setProperty("--nw", (+F[type + "NameW"]) + "%");
-  alert.style.setProperty("--ax", (+F[type + "AmountX"]) + "%");
-  alert.style.setProperty("--ay", (+F[type + "AmountY"]) + "%");
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));   // que se apliquen
 
   // 4. nombre y monto con letras de plastilina
-  const box = document.getElementById("name-box");
+  const box = document.getElementById("label-box");
   alert.classList.add("show");
   const common = { folder: base + "glyphs/", animate: true, jitter: +F.jitter };
   ClayText.render(nameEl, String(ev.name || ev.displayName || "").trim(),
@@ -93,7 +92,8 @@ async function play(type, ev) {
   if (showAmount) {
     let n = ev.amount;
     if (type === "tip") n = (+n).toFixed(2).replace(/\.00$/, "");
-    const text = (F[type + "Prefix"] || "") + n + (F[type + "Suffix"] || "");
+    const suffix = +n === 1 && F[type + "SuffixOne"] !== undefined ? F[type + "SuffixOne"] : F[type + "Suffix"];
+    const text = (F[type + "Prefix"] || "") + n + (suffix || "");
     ClayText.render(amountEl, text, Object.assign({}, common, { size: +F.amountSize, color: F.amountColor }));
   }
 
