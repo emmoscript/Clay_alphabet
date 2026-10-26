@@ -77,39 +77,9 @@
     "step": 0.1,
     "group": "Letras"
   },
-  "nameX": {
-    "type": "number",
-    "label": "Nombre: posición horizontal (% del ancho)",
-    "value": 58,
-    "group": "Posición"
-  },
-  "nameY": {
-    "type": "number",
-    "label": "Nombre: posición vertical (% del alto)",
-    "value": 50,
-    "group": "Posición"
-  },
-  "nameW": {
-    "type": "number",
-    "label": "Nombre: ancho máximo (% del ancho)",
-    "value": 62,
-    "group": "Posición"
-  },
-  "amountX": {
-    "type": "number",
-    "label": "Monto: posición horizontal (%)",
-    "value": 58,
-    "group": "Posición"
-  },
-  "amountY": {
-    "type": "number",
-    "label": "Monto: posición vertical (%)",
-    "value": 80,
-    "group": "Posición"
-  },
   "showMessage": {
     "type": "dropdown",
-    "label": "Mostrar mensaje del usuario",
+    "label": "Mostrar el mensaje del usuario",
     "value": "yes",
     "options": {
       "yes": "Sí",
@@ -119,14 +89,66 @@
   },
   "messageSize": {
     "type": "number",
-    "label": "Tamaño del mensaje (px)",
-    "value": 22,
+    "label": "Tamaño del texto (px)",
+    "value": 24,
     "group": "Mensaje"
   },
   "messageColor": {
     "type": "colorpicker",
-    "label": "Color del mensaje",
+    "label": "Color del texto",
     "value": "#EFE3D3",
+    "group": "Mensaje"
+  },
+  "messageStrokeColor": {
+    "type": "colorpicker",
+    "label": "Color del contorno",
+    "value": "#5B4743",
+    "group": "Mensaje"
+  },
+  "messageStroke": {
+    "type": "number",
+    "label": "Grosor del contorno (px)",
+    "value": 6,
+    "group": "Mensaje"
+  },
+  "messageAlign": {
+    "type": "dropdown",
+    "label": "Alineación",
+    "value": "center",
+    "options": {
+      "left": "Izquierda",
+      "center": "Centro"
+    },
+    "group": "Mensaje"
+  },
+  "dialogWidth": {
+    "type": "number",
+    "label": "Ancho del mensaje (% del ancho de la alerta)",
+    "value": 80,
+    "group": "Mensaje"
+  },
+  "dialogLeft": {
+    "type": "number",
+    "label": "Posición horizontal del mensaje (%)",
+    "value": 18,
+    "group": "Mensaje"
+  },
+  "dialogGap": {
+    "type": "number",
+    "label": "Separación debajo de la placa (px)",
+    "value": 4,
+    "group": "Mensaje"
+  },
+  "typeSpeed": {
+    "type": "number",
+    "label": "Velocidad de escritura (letras por segundo)",
+    "value": 35,
+    "group": "Mensaje"
+  },
+  "maxChars": {
+    "type": "number",
+    "label": "Máximo de letras del mensaje",
+    "value": 300,
     "group": "Mensaje"
   },
   "followOn": {
@@ -161,6 +183,36 @@
     },
     "group": "Follow"
   },
+  "followNameX": {
+    "type": "number",
+    "label": "Follow: nombre, posición horizontal (% del ancho)",
+    "value": 58,
+    "group": "Follow"
+  },
+  "followNameY": {
+    "type": "number",
+    "label": "Follow: nombre, posición vertical (% del alto)",
+    "value": 50,
+    "group": "Follow"
+  },
+  "followNameW": {
+    "type": "number",
+    "label": "Follow: nombre, ancho máximo (% del ancho)",
+    "value": 62,
+    "group": "Follow"
+  },
+  "followAmountX": {
+    "type": "number",
+    "label": "Follow: monto, posición horizontal (%)",
+    "value": 58,
+    "group": "Follow"
+  },
+  "followAmountY": {
+    "type": "number",
+    "label": "Follow: monto, posición vertical (%)",
+    "value": 70,
+    "group": "Follow"
+  },
   "subOn": {
     "type": "dropdown",
     "label": "Activar Sub",
@@ -191,6 +243,46 @@
       "yes": "Sí",
       "no": "No"
     },
+    "group": "Sub"
+  },
+  "subDialog": {
+    "type": "dropdown",
+    "label": "Sub: mostrar mensaje",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Sub"
+  },
+  "subNameX": {
+    "type": "number",
+    "label": "Sub: nombre, posición horizontal (% del ancho)",
+    "value": 58,
+    "group": "Sub"
+  },
+  "subNameY": {
+    "type": "number",
+    "label": "Sub: nombre, posición vertical (% del alto)",
+    "value": 42,
+    "group": "Sub"
+  },
+  "subNameW": {
+    "type": "number",
+    "label": "Sub: nombre, ancho máximo (% del ancho)",
+    "value": 62,
+    "group": "Sub"
+  },
+  "subAmountX": {
+    "type": "number",
+    "label": "Sub: monto, posición horizontal (%)",
+    "value": 58,
+    "group": "Sub"
+  },
+  "subAmountY": {
+    "type": "number",
+    "label": "Sub: monto, posición vertical (%)",
+    "value": 70,
     "group": "Sub"
   },
   "subPrefix": {
@@ -235,6 +327,46 @@
       "yes": "Sí",
       "no": "No"
     },
+    "group": "Donación"
+  },
+  "tipDialog": {
+    "type": "dropdown",
+    "label": "Donación: mostrar mensaje",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Donación"
+  },
+  "tipNameX": {
+    "type": "number",
+    "label": "Donación: nombre, posición horizontal (% del ancho)",
+    "value": 58,
+    "group": "Donación"
+  },
+  "tipNameY": {
+    "type": "number",
+    "label": "Donación: nombre, posición vertical (% del alto)",
+    "value": 42,
+    "group": "Donación"
+  },
+  "tipNameW": {
+    "type": "number",
+    "label": "Donación: nombre, ancho máximo (% del ancho)",
+    "value": 62,
+    "group": "Donación"
+  },
+  "tipAmountX": {
+    "type": "number",
+    "label": "Donación: monto, posición horizontal (%)",
+    "value": 58,
+    "group": "Donación"
+  },
+  "tipAmountY": {
+    "type": "number",
+    "label": "Donación: monto, posición vertical (%)",
+    "value": 70,
     "group": "Donación"
   },
   "tipPrefix": {
@@ -287,6 +419,46 @@
     },
     "group": "Bits"
   },
+  "cheerDialog": {
+    "type": "dropdown",
+    "label": "Bits: mostrar mensaje",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Bits"
+  },
+  "cheerNameX": {
+    "type": "number",
+    "label": "Bits: nombre, posición horizontal (% del ancho)",
+    "value": 58,
+    "group": "Bits"
+  },
+  "cheerNameY": {
+    "type": "number",
+    "label": "Bits: nombre, posición vertical (% del alto)",
+    "value": 42,
+    "group": "Bits"
+  },
+  "cheerNameW": {
+    "type": "number",
+    "label": "Bits: nombre, ancho máximo (% del ancho)",
+    "value": 62,
+    "group": "Bits"
+  },
+  "cheerAmountX": {
+    "type": "number",
+    "label": "Bits: monto, posición horizontal (%)",
+    "value": 58,
+    "group": "Bits"
+  },
+  "cheerAmountY": {
+    "type": "number",
+    "label": "Bits: monto, posición vertical (%)",
+    "value": 70,
+    "group": "Bits"
+  },
   "cheerPrefix": {
     "type": "text",
     "label": "Bits: antes del monto",
@@ -335,6 +507,36 @@
       "yes": "Sí",
       "no": "No"
     },
+    "group": "Raid"
+  },
+  "raidNameX": {
+    "type": "number",
+    "label": "Raid: nombre, posición horizontal (% del ancho)",
+    "value": 58,
+    "group": "Raid"
+  },
+  "raidNameY": {
+    "type": "number",
+    "label": "Raid: nombre, posición vertical (% del alto)",
+    "value": 42,
+    "group": "Raid"
+  },
+  "raidNameW": {
+    "type": "number",
+    "label": "Raid: nombre, ancho máximo (% del ancho)",
+    "value": 62,
+    "group": "Raid"
+  },
+  "raidAmountX": {
+    "type": "number",
+    "label": "Raid: monto, posición horizontal (%)",
+    "value": 58,
+    "group": "Raid"
+  },
+  "raidAmountY": {
+    "type": "number",
+    "label": "Raid: monto, posición vertical (%)",
+    "value": 70,
     "group": "Raid"
   },
   "raidPrefix": {

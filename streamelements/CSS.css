@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap");
 html, body { margin: 0; background: transparent; overflow: hidden; }
 #stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 #alert {
@@ -10,11 +11,23 @@ html, body { margin: 0; background: transparent; overflow: hidden; }
   position: absolute; display: flex; align-items: center; justify-content: center;
   transform: translate(-50%, -50%);
 }
-#name-box   { left: {{nameX}}%; top: {{nameY}}%; width: {{nameW}}%; }
-#amount-box { left: {{amountX}}%; top: {{amountY}}%; }
-#message {
-  position: absolute; left: 50%; top: 100%; transform: translateX(-50%); width: 90%;
-  font: 600 {{messageSize}}px/1.3 "Fredoka", sans-serif; color: {{messageColor}}; text-align: center;
-  text-shadow: 0 2px 4px rgba(0,0,0,.35);
+#name-box   { left: var(--nx); top: var(--ny); width: var(--nw); }
+#amount-box { left: var(--ax); top: var(--ay); }
+#clay-amount:empty { display: none; }
+
+/* ---- mensaje: texto suelto debajo de la placa, sin caja ---- */
+#dialog {
+  position: absolute; top: calc(100% + {{dialogGap}}px); left: {{dialogLeft}}%; width: {{dialogWidth}}%;
+  opacity: 0; transition: opacity .15s steps(2);
 }
-.alertbox-message-emote { height: 1.3em; vertical-align: middle; }
+#dialog.open { opacity: 1; }
+#dialog-inner { overflow: hidden; height: 0; transition: height .12s steps(2); }
+#dialog-text {
+  font: 600 {{messageSize}}px/1.35 "Fredoka", sans-serif; color: {{messageColor}};
+  text-align: {{messageAlign}}; overflow-wrap: anywhere;
+  /* contorno del mismo café que los marcos + sombra, para leerse sobre cualquier fondo */
+  -webkit-text-stroke: {{messageStroke}}px {{messageStrokeColor}}; paint-order: stroke fill;
+  text-shadow: 0 3px 0 {{messageStrokeColor}}, 0 6px 10px rgba(0,0,0,.35);
+  padding-bottom: 8px;
+}
+#dialog-text img { height: 1.3em; vertical-align: -0.3em; }
