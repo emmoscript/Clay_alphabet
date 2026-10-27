@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap");
 html, body { margin: 0; background: transparent; overflow: hidden; }
-#stage { position: absolute; inset: 0; display: flex; justify-content: center; padding: 40px; box-sizing: border-box; }
+#stage { position: absolute; inset: 0; display: flex; justify-content: center; padding: 12px 12px 12px; box-sizing: border-box; }
 #stage.top { align-items: flex-start; } #stage.center { align-items: center; } #stage.bottom { align-items: flex-end; }
 
 #alert {
-  display: flex; align-items: flex-end; width: {{alertWidth}}px;
+  display: flex; align-items: flex-end;
   opacity: 0; transform: translateY(40px);
   transition: opacity .25s steps(3), transform .35s steps(4);
 }
@@ -13,13 +13,15 @@ html, body { margin: 0; background: transparent; overflow: hidden; }
 #alert { filter: drop-shadow(0 {{shadowY}}px {{shadowBlur}}px rgba(40, 25, 20, {{shadowOpacity}})); }
 
 /* personaje */
-#char { flex: none; width: {{charWidth}}px; margin-right: -{{charOverlap}}px; position: relative; z-index: 2; }
-#char:empty, #char.none { display: none; }
-#char-img, #char-vid { display: none; width: 100%; height: auto; }
+/* personaje a la izquierda de la placa, apoyado abajo y metido un poco sobre ella */
+#char { flex: none; height: var(--ch, 260px); margin-right: calc(-1 * var(--co, 40px)); margin-bottom: var(--cl, 0px);
+        position: relative; z-index: 2; }
+#char.none { display: none; }
+#char-img, #char-vid { display: none; height: 100%; width: auto; }
 
 /* placa: la imagen se corta en 9 partes; las esquinas no se deforman y el centro se estira */
 #plate {
-  flex: 1; position: relative; box-sizing: border-box;
+  flex: none; width: {{alertWidth}}px; position: relative; box-sizing: border-box;
   padding: {{platePadY}}px {{platePadX}}px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   border: 30px solid transparent;
@@ -32,15 +34,16 @@ html, body { margin: 0; background: transparent; overflow: hidden; }
 
 #label-box { display: flex; flex-direction: column; align-items: center; gap: {{amountGap}}px; width: 100%; }
 #label-box > div { display: flex !important; justify-content: center; }
-#clay-amount:empty { display: none !important; }
+#clay-amount:empty, #clay-thanks:empty { display: none !important; }
 
 /* texto debajo del nombre, dentro de la placa */
-#dialog { width: 100%; opacity: 0; transition: opacity .15s steps(2); }
+#dialog { width: 100%; box-sizing: border-box; opacity: 0; transition: opacity .15s steps(2); }
 #dialog.open { opacity: 1; margin-top: {{dialogGap}}px; }
 #dialog-inner { overflow: hidden; height: 0; transition: height .12s steps(2); }
 #dialog-text {
   font: 600 {{messageSize}}px/1.35 "Fredoka", sans-serif; color: {{messageColor}};
   text-align: {{messageAlign}}; overflow-wrap: anywhere;
+  max-width: {{messageWidth}}%; margin: 0 auto;   /* el mensaje no llega hasta la esquina de la etiqueta */
   -webkit-text-stroke: {{messageStroke}}px {{messageStrokeColor}}; paint-order: stroke fill;
 }
 #dialog-text img { height: 1.3em; vertical-align: -0.3em; }
@@ -54,7 +57,11 @@ html, body { margin: 0; background: transparent; overflow: hidden; }
 #badge {
   position: absolute; display: none; z-index: 3; height: {{badgeHeight}}px; width: auto;
   transform: translate(-50%, -50%) rotate(var(--rot, -6deg));
-  filter: drop-shadow(0 6px 6px rgba(0,0,0,.3));
+  /* sombra en dos capas, con la luz arriba a la izquierda como en el resto del pack:
+     una corta y oscura (contacto con la placa) y otra amplia y suave */
+  filter: drop-shadow(calc(3px * var(--bs)) calc(5px * var(--bs)) calc(2px * var(--bs)) rgba(60, 35, 25, calc(.45 * var(--bo))))
+          drop-shadow(calc(8px * var(--bs)) calc(14px * var(--bs)) calc(12px * var(--bs)) rgba(60, 35, 25, calc(.35 * var(--bo))));
+  --bs: {{badgeShadowSize}}; --bo: {{badgeShadowStrength}};
 }
 #badge.stamp { animation: stamp .32s steps(4) both; }
 @keyframes stamp {

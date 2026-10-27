@@ -26,17 +26,6 @@
     "step": 1,
     "group": "General"
   },
-  "anchor": {
-    "type": "dropdown",
-    "label": "La alerta crece desde",
-    "value": "bottom",
-    "options": {
-      "bottom": "Abajo (crece hacia arriba)",
-      "center": "Centro",
-      "top": "Arriba (crece hacia abajo)"
-    },
-    "group": "General"
-  },
   "shadowOpacity": {
     "type": "slider",
     "label": "Sombra: intensidad",
@@ -89,25 +78,41 @@
   "platePadX": {
     "type": "number",
     "label": "Margen interno a los lados (px)",
-    "value": 20,
+    "value": 40,
     "group": "Placa"
   },
   "platePadY": {
     "type": "number",
     "label": "Margen interno arriba/abajo (px)",
-    "value": 6,
+    "value": 14,
     "group": "Placa"
   },
-  "charWidth": {
+  "showCharacters": {
+    "type": "dropdown",
+    "label": "Mostrar personajes",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No"
+    },
+    "group": "Personaje y etiqueta"
+  },
+  "charHeight": {
     "type": "number",
-    "label": "Ancho del personaje (px)",
-    "value": 150,
+    "label": "Alto del personaje (px)",
+    "value": 330,
     "group": "Personaje y etiqueta"
   },
   "charOverlap": {
     "type": "number",
     "label": "Cuánto se mete el personaje sobre la placa (px)",
-    "value": 20,
+    "value": 90,
+    "group": "Personaje y etiqueta"
+  },
+  "charLift": {
+    "type": "number",
+    "label": "Subir/bajar el personaje (px, positivo = sube)",
+    "value": 0,
     "group": "Personaje y etiqueta"
   },
   "badgeHeight": {
@@ -129,14 +134,34 @@
     },
     "group": "Personaje y etiqueta"
   },
-  "badgeBalance": {
-    "type": "dropdown",
-    "label": "Equilibrar la etiqueta sobre la esquina (sale lo mismo por el lado y por abajo)",
-    "value": "yes",
-    "options": {
-      "yes": "Sí",
-      "no": "No"
-    },
+  "badgeOutX": {
+    "type": "number",
+    "label": "Etiqueta: cuánto sale por el lado (% de su ancho)",
+    "value": 17,
+    "group": "Personaje y etiqueta"
+  },
+  "badgeOutY": {
+    "type": "number",
+    "label": "Etiqueta: cuánto sale por abajo/arriba (% de su alto)",
+    "value": 29,
+    "group": "Personaje y etiqueta"
+  },
+  "badgeShadowStrength": {
+    "type": "slider",
+    "label": "Sombra de la etiqueta: intensidad",
+    "value": 1,
+    "min": 0,
+    "max": 2,
+    "step": 0.1,
+    "group": "Personaje y etiqueta"
+  },
+  "badgeShadowSize": {
+    "type": "slider",
+    "label": "Sombra de la etiqueta: distancia",
+    "value": 1,
+    "min": 0,
+    "max": 2.5,
+    "step": 0.1,
     "group": "Personaje y etiqueta"
   },
   "badgeDX": {
@@ -271,6 +296,37 @@
     "value": 24,
     "group": "Mensaje"
   },
+  "thanksClay": {
+    "type": "dropdown",
+    "label": "Frase de agradecimiento en letras de plastilina",
+    "value": "yes",
+    "options": {
+      "yes": "Sí",
+      "no": "No, texto normal"
+    },
+    "group": "Mensaje"
+  },
+  "thanksClaySize": {
+    "type": "number",
+    "label": "Tamaño de la frase en plastilina (px)",
+    "value": 32,
+    "group": "Mensaje"
+  },
+  "thanksClayColor": {
+    "type": "dropdown",
+    "label": "Color de la frase en plastilina",
+    "value": "red",
+    "options": {
+      "bone": "Hueso",
+      "cocoa": "Cacao",
+      "red": "Rojo",
+      "blue": "Azul",
+      "yellow": "Amarillo",
+      "pink": "Rosa",
+      "sage": "Verde salvia"
+    },
+    "group": "Mensaje"
+  },
   "messageStrokeColor": {
     "type": "colorpicker",
     "label": "Color del contorno",
@@ -291,6 +347,12 @@
       "left": "Izquierda",
       "center": "Centro"
     },
+    "group": "Mensaje"
+  },
+  "messageWidth": {
+    "type": "number",
+    "label": "Ancho del mensaje (% del interior de la placa)",
+    "value": 84,
     "group": "Mensaje"
   },
   "dialogGap": {
@@ -323,8 +385,30 @@
   },
   "followMedia": {
     "type": "video-input",
-    "label": "Follow: personaje (imagen o WebM transparente)",
+    "label": "Follow: personaje (vacío = el de tu carpeta)",
     "value": "",
+    "group": "Follow"
+  },
+  "followCharScale": {
+    "type": "number",
+    "label": "Follow: tamaño del personaje (1 = normal)",
+    "value": 0.75,
+    "group": "Follow"
+  },
+  "followCharAlign": {
+    "type": "dropdown",
+    "label": "Follow: posición vertical del personaje",
+    "value": "center",
+    "options": {
+      "bottom": "Apoyado abajo",
+      "center": "Centrado con la placa"
+    },
+    "group": "Follow"
+  },
+  "followCharShift": {
+    "type": "number",
+    "label": "Follow: meter el personaje más sobre la placa (px extra)",
+    "value": 55,
     "group": "Follow"
   },
   "followBadge": {
@@ -349,6 +433,12 @@
     "type": "text",
     "label": "Follow: giro propio de la etiqueta (grados, vacío = el general)",
     "value": "",
+    "group": "Follow"
+  },
+  "followBadgeScale": {
+    "type": "number",
+    "label": "Follow: tamaño de la etiqueta (1 = normal)",
+    "value": 1,
     "group": "Follow"
   },
   "followPlate": {
@@ -413,8 +503,58 @@
   },
   "subMedia": {
     "type": "video-input",
-    "label": "Sub: personaje (imagen o WebM transparente)",
+    "label": "Sub: personaje (vacío = el de tu carpeta)",
     "value": "",
+    "group": "Sub"
+  },
+  "subCharScale": {
+    "type": "number",
+    "label": "Sub: tamaño del personaje (1 = normal)",
+    "value": 1,
+    "group": "Sub"
+  },
+  "subCharAlign": {
+    "type": "dropdown",
+    "label": "Sub: posición vertical del personaje",
+    "value": "bottom",
+    "options": {
+      "bottom": "Apoyado abajo",
+      "center": "Centrado con la placa"
+    },
+    "group": "Sub"
+  },
+  "subCharShift": {
+    "type": "number",
+    "label": "Sub: meter el personaje más sobre la placa (px extra)",
+    "value": 0,
+    "group": "Sub"
+  },
+  "subGiftMedia": {
+    "type": "video-input",
+    "label": "Sub regalado: personaje (vacío = el de tu carpeta)",
+    "value": "",
+    "group": "Sub"
+  },
+  "subGiftCharScale": {
+    "type": "number",
+    "label": "Sub regalado: tamaño del personaje (1 = normal)",
+    "value": 1,
+    "group": "Sub"
+  },
+  "subGiftCharAlign": {
+    "type": "dropdown",
+    "label": "Sub regalado: posición vertical del personaje",
+    "value": "bottom",
+    "options": {
+      "bottom": "Apoyado abajo",
+      "center": "Centrado con la placa"
+    },
+    "group": "Sub"
+  },
+  "subGiftCharShift": {
+    "type": "number",
+    "label": "Sub regalado: meter el personaje más sobre la placa (px extra)",
+    "value": 0,
     "group": "Sub"
   },
   "subBadge": {
@@ -439,6 +579,12 @@
     "type": "text",
     "label": "Sub: giro propio de la etiqueta (grados, vacío = el general)",
     "value": "",
+    "group": "Sub"
+  },
+  "subBadgeScale": {
+    "type": "number",
+    "label": "Sub: tamaño de la etiqueta (1 = normal)",
+    "value": 1,
     "group": "Sub"
   },
   "subGiftBadge": {
@@ -555,8 +701,30 @@
   },
   "tipMedia": {
     "type": "video-input",
-    "label": "Donación: personaje (imagen o WebM transparente)",
+    "label": "Donación: personaje (vacío = el de tu carpeta)",
     "value": "",
+    "group": "Donación"
+  },
+  "tipCharScale": {
+    "type": "number",
+    "label": "Donación: tamaño del personaje (1 = normal)",
+    "value": 0.95,
+    "group": "Donación"
+  },
+  "tipCharAlign": {
+    "type": "dropdown",
+    "label": "Donación: posición vertical del personaje",
+    "value": "center",
+    "options": {
+      "bottom": "Apoyado abajo",
+      "center": "Centrado con la placa"
+    },
+    "group": "Donación"
+  },
+  "tipCharShift": {
+    "type": "number",
+    "label": "Donación: meter el personaje más sobre la placa (px extra)",
+    "value": 35,
     "group": "Donación"
   },
   "tipBadge": {
@@ -580,7 +748,13 @@
   "tipBadgeRot": {
     "type": "text",
     "label": "Donación: giro propio de la etiqueta (grados, vacío = el general)",
-    "value": "-13",
+    "value": "-7",
+    "group": "Donación"
+  },
+  "tipBadgeScale": {
+    "type": "number",
+    "label": "Donación: tamaño de la etiqueta (1 = normal)",
+    "value": 1.2,
     "group": "Donación"
   },
   "tipPlate": {
@@ -673,8 +847,30 @@
   },
   "cheerMedia": {
     "type": "video-input",
-    "label": "Bits: personaje (imagen o WebM transparente)",
+    "label": "Bits: personaje (vacío = el de tu carpeta)",
     "value": "",
+    "group": "Bits"
+  },
+  "cheerCharScale": {
+    "type": "number",
+    "label": "Bits: tamaño del personaje (1 = normal)",
+    "value": 1,
+    "group": "Bits"
+  },
+  "cheerCharAlign": {
+    "type": "dropdown",
+    "label": "Bits: posición vertical del personaje",
+    "value": "bottom",
+    "options": {
+      "bottom": "Apoyado abajo",
+      "center": "Centrado con la placa"
+    },
+    "group": "Bits"
+  },
+  "cheerCharShift": {
+    "type": "number",
+    "label": "Bits: meter el personaje más sobre la placa (px extra)",
+    "value": 0,
     "group": "Bits"
   },
   "cheerBadge": {
@@ -699,6 +895,12 @@
     "type": "text",
     "label": "Bits: giro propio de la etiqueta (grados, vacío = el general)",
     "value": "",
+    "group": "Bits"
+  },
+  "cheerBadgeScale": {
+    "type": "number",
+    "label": "Bits: tamaño de la etiqueta (1 = normal)",
+    "value": 1,
     "group": "Bits"
   },
   "cheerPlate": {
@@ -843,8 +1045,30 @@
   },
   "raidMedia": {
     "type": "video-input",
-    "label": "Raid: personaje (imagen o WebM transparente)",
+    "label": "Raid: personaje (vacío = el de tu carpeta)",
     "value": "",
+    "group": "Raid"
+  },
+  "raidCharScale": {
+    "type": "number",
+    "label": "Raid: tamaño del personaje (1 = normal)",
+    "value": 0.95,
+    "group": "Raid"
+  },
+  "raidCharAlign": {
+    "type": "dropdown",
+    "label": "Raid: posición vertical del personaje",
+    "value": "bottom",
+    "options": {
+      "bottom": "Apoyado abajo",
+      "center": "Centrado con la placa"
+    },
+    "group": "Raid"
+  },
+  "raidCharShift": {
+    "type": "number",
+    "label": "Raid: meter el personaje más sobre la placa (px extra)",
+    "value": 0,
     "group": "Raid"
   },
   "raidBadge": {
@@ -869,6 +1093,12 @@
     "type": "text",
     "label": "Raid: giro propio de la etiqueta (grados, vacío = el general)",
     "value": "",
+    "group": "Raid"
+  },
+  "raidBadgeScale": {
+    "type": "number",
+    "label": "Raid: tamaño de la etiqueta (1 = normal)",
+    "value": 1,
     "group": "Raid"
   },
   "raidPlate": {

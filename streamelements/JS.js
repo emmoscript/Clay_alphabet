@@ -15,7 +15,8 @@ const EVENTS = {
 window.addEventListener("onWidgetLoad", (obj) => {
   F = obj.detail.fieldData;
   const base = (F.baseUrl || "").replace(/\/?$/, "/");
-  document.getElementById("stage").className = F.anchor || "bottom";
+  document.getElementById("stage").className = "center";      // siempre centrada en el widget
+  console.log("clay-alerts v25");
   const s = document.createElement("script");
   s.src = base + "clay_text.js";
   s.onload = () => ClayText.load(base + "glyphs/");
@@ -128,9 +129,9 @@ function thanksLine(type, ev) {
 
 // placas que vienen en tu carpeta (alerts/): tamaño en px y cuánto miden las curvas de las esquinas
 const PLATES = {
-  s: { file: "plate_s.png", w: 1000, h: 308, sx: 191, sy: 123, rim: 40 },
-  m: { file: "plate_m.png", w: 1000, h: 347, sx: 183, sy: 129, rim: 40 },
-  l: { file: "plate_l.png", w: 1000, h: 558, sx: 187, sy: 145, rim: 40 },
+  s: { file: "plate_s.png", w: 1000, h: 308, sx: 191, sy: 123, rim: 62 },
+  m: { file: "plate_m.png", w: 1000, h: 347, sx: 183, sy: 129, rim: 62 },
+  l: { file: "plate_l.png", w: 1000, h: 558, sx: 187, sy: 145, rim: 62 },
 };
 
 // alto que ocupará el texto (frase + mensaje) dentro de la placa, medido antes de mostrar
@@ -163,24 +164,37 @@ function placeBadge(type) {
   };
   const [x, y] = spots[F.badgeSpot] || spots["bottom-right"];
   // ajuste general + ajuste propio de cada etiqueta (las anchas se corren un poco)
-  badge.style.left = (x - bw + (+F.badgeDX || 0) + (+F[type + "BadgeDX"] || 0)) + "px";
-  badge.style.top = (y - bw + (+F.badgeDY || 0) + (+F[type + "BadgeDY"] || 0)) + "px";
+  badge.style.left = (x - bw) + "px";
+  badge.style.top = (y - bw) + "px";
+  const scale = +F[type + "BadgeScale"] || 1;                // tamaño propio de cada etiqueta
+  badge.style.height = (+F.badgeHeight || 100) * scale + "px";
   const ownRot = F[type + "BadgeRot"];                     // giro propio de esta etiqueta (vacío = el general)
   badge.style.setProperty("--rot", (ownRot !== undefined && ownRot !== "" ? +ownRot : (+F.badgeRotate || 0)) + "deg");
   badge.style.display = "block";
 
-  // equilibrar: que la etiqueta sobresalga lo mismo por el lado y por arriba/abajo de la esquina,
-  // sin cambiar su giro (se mide la etiqueta ya girada)
-  if (F.badgeBalance !== "no" && spots[F.badgeSpot || "bottom-right"] && F.badgeSpot !== "top-center") {
+  // cuánto sobresale la etiqueta de la placa, en % de su propio tamaño (ya girada):
+  // así queda igual en las 3 placas y tapa la esquina redonda
+  if (F.badgeSpot !== "top-center") {
     const spot = F.badgeSpot || "bottom-right";
     const p = plate.getBoundingClientRect(), b = badge.getBoundingClientRect();
-    const outX = spot.endsWith("right") ? b.right - p.right : p.left - b.left;     // cuánto sale por el lado
-    const outY = spot.startsWith("bottom") ? b.bottom - p.bottom : p.top - b.top; // cuánto sale por arriba/abajo
-    const even = (outX + outY) / 2;
+    const wantX = b.width * (+F.badgeOutX || 0) / 100, wantY = b.height * (+F.badgeOutY || 0) / 100;
+    const outX = spot.endsWith("right") ? b.right - p.right : p.left - b.left;
+    const outY = spot.startsWith("bottom") ? b.bottom - p.bottom : p.top - b.top;
+    const z = +document.getElementById("alert").style.zoom || 1;     // las medidas vienen con el zoom aplicado
     const sx = spot.endsWith("right") ? 1 : -1, sy = spot.startsWith("bottom") ? 1 : -1;
-    badge.style.left = (parseFloat(badge.style.left) + sx * (even - outX)) + "px";
-    badge.style.top = (parseFloat(badge.style.top) + sy * (even - outY)) + "px";
+    badge.style.left = (parseFloat(badge.style.left) + sx * (wantX - outX) / z) + "px";
+    badge.style.top = (parseFloat(badge.style.top) + sy * (wantY - outY) / z) + "px";
   }
+  // + ajuste a mano de cada etiqueta
+  badge.style.left = (parseFloat(badge.style.left) + (+F.badgeDX || 0) + (+F[type + "BadgeDX"] || 0)) + "px";
+  badge.style.top = (parseFloat(badge.style.top) + (+F.badgeDY || 0) + (+F[type + "BadgeDY"] || 0)) + "px";
+
+  // fijar la etiqueta a la esquina (no a la posición de ahora): si la placa crece, la etiqueta la sigue
+  const spotNow = F.badgeSpot || "bottom-right";
+  const innerW = W - 2 * bw, innerH = H - 2 * bw;
+  const L = parseFloat(badge.style.left), T = parseFloat(badge.style.top);
+  badge.style.left = spotNow.endsWith("right") ? `calc(100% + ${L - innerW}px)` : spotNow === "top-center" ? `calc(50% + ${L - innerW / 2}px)` : L + "px";
+  badge.style.top = spotNow.startsWith("bottom") ? `calc(100% + ${T - innerH}px)` : T + "px";
   void badge.offsetWidth;
   badge.classList.add("stamp");
 }
@@ -207,7 +221,11 @@ async function play(type, ev) {
   const vid = document.getElementById("char-vid");
   const badge = document.getElementById("badge");
   const snd = document.getElementById("sound");
-  const media = F[type + "Media"] || "";                 // personaje de esta alerta
+  // personaje: el del panel, o el de tu carpeta characters/ (follow, sub, giftsub, tip, cheer, raid)
+  const isGift = type === "sub" && (ev.gifted || ev.bulkGifted);
+  const charKey = isGift ? "giftsub" : type;
+  const media = (isGift ? F.subGiftMedia : F[type + "Media"]) ||
+                (F.showCharacters === "no" ? "" : `${base}characters/${charKey}.webm`);
   const isVideo = /\.(webm|mp4|mov)(\?|$)/i.test(media);
 
   // 1. limpiar la alerta anterior y esconder todo mientras carga la nueva
@@ -215,7 +233,17 @@ async function play(type, ev) {
   img.style.display = vid.style.display = badge.style.display = "none";
   const nameEl = document.getElementById("clay-name");
   const amountEl = document.getElementById("clay-amount");
-  nameEl.innerHTML = amountEl.innerHTML = "";
+  charBox.classList.toggle("none", !media);
+  const charH = (+F.charHeight || 260) * (+F[(isGift ? "subGift" : type) + "CharScale"] || 1);
+  charBox.style.setProperty("--ch", charH + "px");
+  const ck = (isGift ? "subGift" : type);
+  // cuánto se mete sobre la placa: el general + el propio de este personaje
+  charBox.style.setProperty("--co", ((+F.charOverlap || 0) + (+F[ck + "CharShift"] || 0)) + "px");
+  // cabezas que flotan (corazón, payaso) van centradas en vertical; los que están de pie, apoyados abajo
+  charBox.style.alignSelf = F[ck + "CharAlign"] === "center" ? "center" : "flex-end";
+  charBox.style.setProperty("--cl", (+F.charLift || 0) + "px");
+  const thanksEl = document.getElementById("clay-thanks");
+  nameEl.innerHTML = amountEl.innerHTML = thanksEl.innerHTML = "";
   closeDialog();
 
   // textos de esta alerta (se calculan antes para escoger la placa)
@@ -227,16 +255,23 @@ async function play(type, ev) {
   const W = plate.offsetWidth || (+F.alertWidth || 760);
   const k = W / 1000;
   const padY = +F.platePadY || 0, padX = +F.platePadX || 0;
-  const labelH = +F.nameSize * 1.15 + (F[type + "Amount"] === "yes" && ev.amount ? +F.amountSize * 1.15 + (+F.amountGap || 0) : 0);
+  const clayThanks = !!thanks && F.thanksClay !== "no";       // frase en letras de plastilina
+  const gap = +F.amountGap || 0;
+  const labelH = +F.nameSize * 1.35          // cada línea de plastilina: alto de letra + espacio para g, p, y
+    + (F[type + "Amount"] === "yes" && ev.amount ? +F.amountSize * 1.35 + gap : 0)
+    + (clayThanks ? +F.thanksClaySize * 1.35 + gap : 0);
   const textW = W - 2 * (PLATES.s.rim * k + padX);
-  // espacio extra para que la etiqueta no tape el nombre (arriba) o el texto (abajo)
-  const spot = F.badgeSpot || "top-left";
-  const badgeRoom = F.showBadges === "no" ? 0 : (+F.badgeHeight || 100) * 0.38;
-  plate.style.paddingTop = (padY + (spot.startsWith("top") ? badgeRoom : 0)) + "px";
-  plate.style.paddingBottom = (padY + (spot.startsWith("bottom") ? badgeRoom : 0)) + "px";
-  const needH = labelH + textHeight(textW, thanks, msg.trim() ? msg : "") + 2 * (padY + PLATES.s.rim * k) + badgeRoom;
+  // espacio extra solo si la etiqueta va arriba (en la esquina de abajo no tapa nada)
+  const spot = F.badgeSpot || "bottom-right";
+  const badgeRoom = F.showBadges === "no" || !spot.startsWith("top") ? 0 : (+F.badgeHeight || 100) * 0.38;
+  plate.style.paddingTop = (padY + badgeRoom) + "px";
+  const cornerRoom = 0;   // el mensaje ya es más angosto que la placa: la etiqueta de la esquina no lo tapa
+  plate.style.paddingBottom = (padY + cornerRoom) + "px";
+  const textH = textHeight(textW * (+F.messageWidth || 86) / 100, clayThanks ? "" : thanks, msg.trim() ? msg : "");
+  const needH = labelH + textH + 2 * (padY + PLATES.s.rim * k) + badgeRoom + cornerRoom;
   let chosen = "l";
-  for (const key of ["s", "m", "l"]) if (PLATES[key].h * k >= needH) { chosen = key; break; }
+  // cada placa puede estirarse un poco (hasta +30%) antes de pasar a la siguiente
+  for (const key of ["s", "m", "l"]) if (PLATES[key].h * k * 1.3 >= needH) { chosen = key; break; }
   const P = PLATES[chosen];
   const own = F[type + "Plate"] || F["plate" + chosen.toUpperCase()];   // imagen subida en el panel (opcional)
   const plateImg = own || (F.useDrawnPlate === "yes" ? "" : `${base}alerts/${P.file}`);
@@ -246,7 +281,8 @@ async function play(type, ev) {
     plate.style.borderImage = `url("${plateImg}") ${sy} ${sx} fill / ${sy * k}px ${sx * k}px stretch`;
     plate.style.borderWidth = `${P.rim * k}px`;
     plate.style.minHeight = `${P.h * k}px`;
-    CURVE = { rx: sx * k, ry: sy * k, rim: P.rim * k };
+    // misma esquina para las 3 placas: la etiqueta queda en el mismo sitio sea cual sea la placa
+    CURVE = { rx: 187 * k, ry: 132 * k, rim: P.rim * k };
   } else {
     plate.classList.add("drawn");
     CURVE = { rx: 40, ry: 40, rim: 8 };
@@ -255,8 +291,21 @@ async function play(type, ev) {
     plate.style.minHeight = "";
   }
 
+  // el espacio del mensaje se reserva desde el principio: el nombre no se mueve mientras se escribe
+  // (se mide el texto real, dentro de la placa, invisible por un instante)
+  {
+    const dt = document.getElementById("dialog-text");
+    const html = (thanks && !clayThanks ? `<div class="thanks">${escapeHTML(thanks)}</div>` : "") +
+                 (msg.trim() ? `<div class="user-msg">${msg}</div>` : "");
+    dt.style.visibility = "hidden";
+    dt.innerHTML = html;
+    const realT = html ? dt.offsetHeight : 0;
+    dt.innerHTML = "";
+    dt.style.visibility = "";
+    document.getElementById("dialog").style.minHeight = realT ? realT + "px" : "";
+  }
+
   // 2. esperar a que carguen personaje y etiqueta antes de mostrar nada
-  charBox.classList.toggle("none", !media);
   const loads = [];
   if (media && isVideo) {
     vid.src = media;
@@ -271,6 +320,30 @@ async function play(type, ev) {
   if (badgeSrc) { badge.src = badgeSrc; loads.push(badge.decode().catch(() => {})); }
   if (plateImg) { const p = new Image(); p.src = plateImg; loads.push(p.decode().catch(() => {})); }
   await Promise.all(loads);
+
+  // que la alerta completa (con la etiqueta que sobresale) quepa siempre dentro del widget
+  const plateH = Math.max(plateImg ? P.h * k : 0, needH);
+  const bh = +F.badgeHeight || 100;
+  const bwid = badgeSrc && badge.naturalWidth ? bh * badge.naturalWidth / badge.naturalHeight : bh;
+  const over = badgeSrc ? bh * 0.6 : 0;                 // lo que sobresale por abajo
+  const overX = badgeSrc ? bwid * 0.55 : 0;             // lo que sobresale por el lado
+  const charW = media && isVideo && vid.videoWidth ? charH * vid.videoWidth / vid.videoHeight
+              : media && img.naturalWidth ? charH * img.naturalWidth / img.naturalHeight : 0;
+  const groupW = (+F.alertWidth || 760) + (charW ? charW - (+F.charOverlap || 0) : 0);
+  const groupH = Math.max(plateH, charW ? charH + (+F.charLift || 0) : 0);
+  const fit = Math.min(1, (window.innerHeight - 24) / (groupH + over), (window.innerWidth - 24) / (groupW + 2 * overX));
+  alert.style.zoom = fit;
+  // la etiqueta sobresale por abajo: se deja ese espacio libre en el borde del widget
+  const stage = document.getElementById("stage");
+  // centrar el conjunto placa + etiqueta (no solo la placa): se compensa lo que sobresale la etiqueta
+  const corner = F.badgeSpot || "bottom-right";
+  const padB = corner.startsWith("bottom") ? over * 0.75 * fit : 0;
+  const padT = corner.startsWith("top") ? over * 0.75 * fit : 0;
+  const padR = corner.endsWith("right") ? overX * fit : 0;
+  const padL = corner.endsWith("left") ? overX * fit : 0;
+  Object.assign(stage.style, { paddingTop: 12 + padT + "px", paddingBottom: 12 + padB + "px",
+                               paddingLeft: 12 + padL + "px", paddingRight: 12 + padR + "px" });
+
   if (media && isVideo) { vid.style.display = "block"; vid.currentTime = 0; vid.play().catch(() => {}); }
   else if (media) img.style.display = "block";
   badge.classList.remove("stamp");
@@ -299,12 +372,28 @@ async function play(type, ev) {
     }
   }
 
+  // frase de agradecimiento en plastilina (sin ¡ ¿, que no existen en el alfabeto)
+  if (clayThanks) {
+    await wait(250);
+    ClayText.render(thanksEl, thanks.replace(/[¡¿]/g, "").trim(),
+      Object.assign({}, common, { size: +F.thanksClaySize, maxWidth: box.clientWidth, color: F.thanksClayColor }));
+  }
+
+  // si al final la placa quedó más alta de lo calculado, se reajusta para que nada se corte
+  await new Promise(r => requestAnimationFrame(r));
+  {
+    const realH = plate.offsetHeight + over;
+    const z = +alert.style.zoom || 1;
+    const room = window.innerHeight - 24 - parseFloat(stage.style.paddingBottom || 0) + 12;
+    if (realH * z > room) alert.style.zoom = Math.max(0.4, room / realH);
+  }
+
   const sound = F[type + "Sound"];
   if (sound) { snd.src = sound; snd.volume = (+F.volume || 50) / 100; snd.currentTime = 0; snd.play().catch(() => {}); }
 
   // 5. frase de agradecimiento (español / inglés / spanglish) + mensaje del usuario, letra por letra
   const segments = [];
-  if (thanks) segments.push({ cls: "thanks", html: escapeHTML(thanks) });
+  if (thanks && !clayThanks) segments.push({ cls: "thanks", html: escapeHTML(thanks) });
   if (msg.trim()) segments.push({ cls: "user-msg", html: msg });
 
   let typed = 0;
