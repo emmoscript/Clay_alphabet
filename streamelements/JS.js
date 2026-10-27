@@ -16,7 +16,7 @@ window.addEventListener("onWidgetLoad", (obj) => {
   F = obj.detail.fieldData;
   const base = (F.baseUrl || "").replace(/\/?$/, "/");
   document.getElementById("stage").className = "center";      // siempre centrada en el widget
-  console.log("clay-alerts v25");
+  console.log("clay-alerts v32");
   const s = document.createElement("script");
   s.src = base + "clay_text.js";
   s.onload = () => ClayText.load(base + "glyphs/");
@@ -234,14 +234,25 @@ async function play(type, ev) {
   const nameEl = document.getElementById("clay-name");
   const amountEl = document.getElementById("clay-amount");
   charBox.classList.toggle("none", !media);
-  const charH = (+F.charHeight || 260) * (+F[(isGift ? "subGift" : type) + "CharScale"] || 1);
+  // tamaño y posición de cada personaje: vienen fijos aquí (ya ajustados) y el panel solo suma ajustes,
+  // así un valor viejo guardado en StreamElements no los desacomoda
+  const CHAR_PRESETS = {
+    follow:  { scale: 0.75, shift: 55, align: "center" },
+    sub:     { scale: 1,    shift: 0,  align: "bottom" },
+    subGift: { scale: 1,    shift: 0,  align: "bottom" },
+    tip:     { scale: 0.95, shift: 35, align: "center" },
+    cheer:   { scale: 1,    shift: 0,  align: "bottom" },
+    raid:    { scale: 0.95, shift: 0,  align: "bottom" },
+  };
+  const ck = isGift ? "subGift" : type;
+  const pre = CHAR_PRESETS[ck] || { scale: 1, shift: 0, align: "bottom" };
+  const charH = 330 * pre.scale * (+F.charSizeAdj || 1) * (+F[ck + "CharSizeAdj"] || 1);
+  const charOver = 90 + pre.shift + (+F.charMoveAdj || 0) + (+F[ck + "CharMoveAdj"] || 0);
+  const charLift = (+F.charLiftAdj || 0);
   charBox.style.setProperty("--ch", charH + "px");
-  const ck = (isGift ? "subGift" : type);
-  // cuánto se mete sobre la placa: el general + el propio de este personaje
-  charBox.style.setProperty("--co", ((+F.charOverlap || 0) + (+F[ck + "CharShift"] || 0)) + "px");
-  // cabezas que flotan (corazón, payaso) van centradas en vertical; los que están de pie, apoyados abajo
-  charBox.style.alignSelf = F[ck + "CharAlign"] === "center" ? "center" : "flex-end";
-  charBox.style.setProperty("--cl", (+F.charLift || 0) + "px");
+  charBox.style.setProperty("--co", charOver + "px");
+  charBox.style.setProperty("--cl", charLift + "px");
+  charBox.style.alignSelf = pre.align === "center" ? "center" : "flex-end";
   const thanksEl = document.getElementById("clay-thanks");
   nameEl.innerHTML = amountEl.innerHTML = thanksEl.innerHTML = "";
   closeDialog();
@@ -329,8 +340,8 @@ async function play(type, ev) {
   const overX = badgeSrc ? bwid * 0.55 : 0;             // lo que sobresale por el lado
   const charW = media && isVideo && vid.videoWidth ? charH * vid.videoWidth / vid.videoHeight
               : media && img.naturalWidth ? charH * img.naturalWidth / img.naturalHeight : 0;
-  const groupW = (+F.alertWidth || 760) + (charW ? charW - (+F.charOverlap || 0) : 0);
-  const groupH = Math.max(plateH, charW ? charH + (+F.charLift || 0) : 0);
+  const groupW = (+F.alertWidth || 760) + (charW ? charW - charOver : 0);
+  const groupH = Math.max(plateH, charW ? charH + charLift : 0);
   const fit = Math.min(1, (window.innerHeight - 24) / (groupH + over), (window.innerWidth - 24) / (groupW + 2 * overX));
   alert.style.zoom = fit;
   // la etiqueta sobresale por abajo: se deja ese espacio libre en el borde del widget
