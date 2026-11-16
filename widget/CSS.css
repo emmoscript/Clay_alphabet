@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap');
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: transparent; overflow: hidden; }
+
+.chat {
+  position: absolute; inset: 0;
+  padding: {{padding}}px;
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-size: {{fontSize}}px;
+  display: flex;
+}
+/* vertical: lista que crece hacia arriba */
+.chat.vertical { flex-direction: column; justify-content: flex-end; gap: {{gap}}px; }
+.chat.vertical.right .msg { align-self: flex-end; flex-direction: row-reverse; }
+.chat.vertical.right .body { align-items: flex-end; }
+/* horizontal: una fila que corre hacia la izquierda */
+.chat.horizontal { flex-direction: row; align-items: flex-end; gap: {{gap}}px; justify-content: flex-end; }
+.chat.horizontal .msg { flex: none; }
+
+.msg { display: flex; align-items: flex-end; gap: .35em; max-width: 100%; transform-origin: 0 100%; }
+.msg.pop { animation: squash .42s steps(5) both; }
+.msg.out { animation: away .4s steps(4) both; }
+@keyframes squash {
+  0%   { transform: translateY(40%) scale(.6, .4); opacity: 0; }
+  40%  { transform: translateY(0) scale(1.12, .86); opacity: 1; }
+  70%  { transform: scale(.95, 1.06); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes away { to { transform: scale(1.15, 0); opacity: 0; } }
+
+/* disco del rol */
+.role {
+  flex: none; width: 2.2em; height: 2.2em; margin-bottom: .1em;
+  background: url('{{assets}}disc.png') center / contain no-repeat;
+  display: grid; place-items: center;
+  filter: drop-shadow(0 .12em .1em rgba(0,0,0,.45));
+}
+.role img { width: 64%; height: 64%; object-fit: contain; }
+.role svg { width: 58%; height: 58%; }
+
+.body { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; max-width: calc(100% - 2.6em); }
+
+/* etiqueta del nombre */
+.tag {
+  display: inline-flex; align-items: center; gap: .35em;
+  margin: 0 0 -.25em .5em; position: relative; z-index: 2;
+  border-style: solid; border-width: .42em .62em;
+  border-image: url('{{assets}}tag.png') 50 58 fill / .42em .62em stretch;
+  color: {{nameColor}}; font-weight: 700; font-size: .68em; letter-spacing: .06em;
+  text-transform: uppercase; line-height: 1.1; white-space: nowrap;
+  filter: drop-shadow(0 .1em .08em rgba(0,0,0,.4));
+}
+.tag .arrow { font-weight: 700; }
+.tag .plat { width: 1.35em; height: 1.35em; margin: -.15em 0; }
+.tag .dot { width: .7em; height: .7em; border-radius: 50%; }
+
+/* burbuja del mensaje */
+.bubble {
+  border-style: solid; border-width: .6em .95em;
+  border-image: url('{{assets}}bubble.png') 72 84 fill / .6em .95em stretch;
+  color: {{textColor}}; font-weight: 500; line-height: 1.25;
+  padding: .05em .15em; word-wrap: break-word; overflow-wrap: anywhere;
+  filter: drop-shadow(0 .14em .12em rgba(0,0,0,.45));
+}
+.bubble .emote { height: 1.6em; vertical-align: middle; margin: -.25em .05em; }
+.bubble.only-emotes { border-width: .45em .8em; }
+.bubble.only-emotes .emote { height: 2.6em; margin: 0 .05em; }
+.bubble .mention { color: {{accentColor}}; font-weight: 600; }
+.chat.horizontal .bubble { white-space: nowrap; max-width: {{maxWidthH}}px; overflow: hidden; text-overflow: ellipsis; }

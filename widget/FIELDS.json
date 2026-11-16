@@ -1,0 +1,19 @@
+{
+  "assets":        { "type": "text", "label": "Carpeta de imágenes (URL)", "value": "https://cdn.jsdelivr.net/gh/emmoscript/Clay_alphabet@chat-v1/chat/" },
+  "layout":        { "type": "dropdown", "label": "Diseño", "value": "vertical", "options": { "vertical": "Vertical (lista)", "horizontal": "Horizontal (una fila)" } },
+  "align":         { "type": "dropdown", "label": "Lado", "value": "left", "options": { "left": "Izquierda", "right": "Derecha" } },
+  "platformStyle": { "type": "dropdown", "label": "Indicador de plataforma", "value": "logo", "options": { "logo": "Logo de plastilina", "dot": "Punto de color" } },
+  "roleIcons":     { "type": "dropdown", "label": "Iconos de rol", "value": "png", "options": { "png": "Plastilina", "svg": "Simples" } },
+  "fontSize":      { "type": "number", "label": "Tamaño de letra (px)", "value": 26, "min": 12, "max": 60 },
+  "gap":           { "type": "number", "label": "Espacio entre mensajes (px)", "value": 10, "min": 0, "max": 60 },
+  "padding":       { "type": "number", "label": "Margen (px)", "value": 16, "min": 0, "max": 80 },
+  "maxMessages":   { "type": "number", "label": "Máximo de mensajes", "value": 8, "min": 1, "max": 30 },
+  "hideAfter":     { "type": "number", "label": "Ocultar después de (s, 0 = nunca)", "value": 0, "min": 0, "max": 600 },
+  "maxWidthH":     { "type": "number", "label": "Ancho máx. de burbuja en horizontal (px)", "value": 520, "min": 120, "max": 1600 },
+  "textColor":     { "type": "colorpicker", "label": "Color del texto", "value": "#FEEDD9" },
+  "nameColor":     { "type": "colorpicker", "label": "Color del nombre", "value": "#4A3530" },
+  "accentColor":   { "type": "colorpicker", "label": "Color de @menciones", "value": "#FF9AA2" },
+  "hideCommands":  { "type": "dropdown", "label": "Ocultar comandos (!)", "value": "yes", "options": { "yes": "Sí", "no": "No" } },
+  "hideUsers":     { "type": "text", "label": "Ocultar usuarios (separados por coma)", "value": "StreamElements,Nightbot" },
+  "demo":          { "type": "dropdown", "label": "Mensajes de prueba", "value": "no", "options": { "no": "No", "yes": "Sí" } }
+}

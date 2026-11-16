@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Clay channels</title>
+<!--
+  La tele de plastilina que hace zapping entre tus canales.
+
+  Carpeta:  channels.html  +  channels/ (videos .webm y los dos marcos .png)
+
+  En OBS: Fuente de navegador, SIN "Archivo local":
+    Horizontal (1920x1080):
+      http://absolute/C:/Users/emilm/Documents/Streaming-Materials/clay_alphabet/channels.html?layout=tv
+    Vertical TikTok (1080x1920):
+      http://absolute/C:/Users/emilm/Documents/Streaming-Materials/clay_alphabet/channels.html?layout=pocket
+
+  Opciones (con &):
+    min=10            segundos máximos por canal (la programación sigue el reloj: tele y pocket van iguales)
+    title=0           sin el título de plastilina dentro de la pantalla
+    tplace=none|screen|body  sin título / dentro de la pantalla / en el aparato (tv: none, pocket: body)
+    tpos=bl|br|tl     esquina del título: abajo-izq (default), abajo-der, arriba-izq
+    talign=right|left|center  alineación de las líneas del título entre sí (default right)
+    tscreen=starting  qué título: starting | brb | ending
+    tlang=both|es|en  idioma del título
+    vol=0.7           volumen del audio de los canales (0 a 1)
+    mute=1            sin audio de canales
+    zap=0.5           volumen del ruido de estática al cambiar (0 = sin ruido)
+    order=1           en orden 1,2,3... en vez de al azar
+    only=1,3,5        solo esos canales
+    bg=1A1A1A         color detrás de la tele (por defecto transparente)
+    debug=1           cartel con lo que está pasando
+-->
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  #stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  #screen { position: absolute; overflow: hidden; background: #050505; }
+  #screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+  #screen video.on { opacity: 1; }
+  #static { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; image-rendering: pixelated; }
+  /* líneas de CRT y viñeta, suaves */
+  #crt { position: absolute; inset: 0; pointer-events: none;
+         background:
+           repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, rgba(0,0,0,0) 1px 3px),
+           radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(0,0,0,.45) 100%); }
+  #osd { position: absolute; right: 6%; top: 6%; font: 700 64px/1 "Courier New", ui-monospace, monospace;
+         color: #39FF5A; letter-spacing: 4px; transform: scaleY(1.25); transform-origin: right top;
+         text-shadow: 3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 0 10px rgba(57,255,90,.6);
+         opacity: 0; transition: opacity .15s steps(2); }
+  #title { position: absolute; border: 0; background: transparent; pointer-events: none; }
+  #frame { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+  #msg { position: absolute; left: 12px; top: 12px; font: 600 22px system-ui, sans-serif; color: #fff;
+         background: rgba(0,0,0,.75); padding: 8px 12px; border-radius: 8px; display: none; z-index: 9; white-space: pre; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="screen">
+    <video id="vA" playsinline loop></video>
+    <video id="vB" playsinline loop></video>
+    <canvas id="static"></canvas>
+    <div id="crt"></div>
+    <div id="osd">CH 01</div>
+  </div>
+  <img id="frame" alt="">
+  <iframe id="title" scrolling="no"></iframe>
+</div>
+<div id="msg"></div>
+<script>
+window.onerror = function (m, s, l) { var d = document.getElementById("msg"); d.textContent = "Error: " + m + " (línea " + l + ")"; d.style.display = "block"; };
+(function () {
+  const P = new URLSearchParams(location.search);
+  const num = (k, d) => (P.has(k) && !isNaN(+P.get(k)) ? +P.get(k) : d);
+
+  // ---- tus canales (el número de canal es la posición en esta lista) ----
+  const CHANNELS = [
+    "01-rock.webm", "02-kabukicho.webm", "03-rapero.webm", "04-astronauta.webm",
+    "05-zombis.webm", "07-sasquatch.webm",
+    "09-perro-dj.webm", "10-skater.webm", "11-diner.webm", "12-tigre.webm",
+    "13-cowboy.webm", "14-karate.webm", "15-banana.webm", "16-backrooms.webm",
+    "17-cavernicola.webm", "18-teatro-medieval.webm", "19-dunas.webm",
+    "20-noticias-monstruo.webm", "21-raptores.webm", "22-perro-maneja.webm", "23-santa.webm",
+  ];
+  const DIR = (P.get("dir") || "channels/").replace(/\/?$/, "/");
+
+  // ---- los dos aparatos: tamaño del lienzo y hueco de la pantalla (medido en el PNG) ----
+  const LAYOUTS = {
+    tv:     { W: 1920, H: 1080, frame: "tv_frame.png",     screen: [308, 169, 912, 734], osd: 64, place: "none" },
+    // pocket: el título va en la placa oscura bajo la pantalla, como el nombre del aparato
+    pocket: { W: 1080, H: 1920, frame: "pocket_frame.png", screen: [273, 369, 530, 426], osd: 44, place: "body", plate: [235, 936, 610, 84] },
+  };
+  const L = LAYOUTS[P.get("layout")] || LAYOUTS.tv;
+  const MIN = num("min", 10), MAX = Math.max(num("max", MIN), MIN);
+  const VOL = P.get("mute") === "1" ? 0 : Math.min(1, num("vol", 0.7));
+  const ZAPVOL = Math.min(1, num("zap", 0.5));
+  const ORDER = P.get("order") === "1";
+  const ONLY = P.get("only") ? P.get("only").split(",").map(n => +n - 1).filter(i => CHANNELS[i]) : null;
+  const pool = ONLY && ONLY.length ? ONLY : CHANNELS.map((_, i) => i);
+  if (P.get("bg")) document.body.style.background = "#" + P.get("bg").replace(/^#/, "");
+
+  // ---- armar ----
+  const stage = document.getElementById("stage");
+  stage.style.width = L.W + "px"; stage.style.height = L.H + "px";
+  const fit = () => { stage.style.transform = `scale(${Math.min(innerWidth / L.W, innerHeight / L.H)})`; };
+  fit(); addEventListener("resize", fit);
+  const scr = document.getElementById("screen");
+  const [sx, sy, sw, sh] = L.screen;
+  Object.assign(scr.style, { left: sx + "px", top: sy + "px", width: sw + "px", height: sh + "px" });
+  document.getElementById("frame").src = DIR + L.frame;
+  // título de plastilina en una esquina de la pantalla, como gráfico del canal (titles.html va junto a este archivo)
+  if (P.get("title") !== "0" && (P.get("tplace") || L.place) !== "none") {
+    const t = document.getElementById("title");
+    const place = P.get("tplace") || L.place;
+    let cw = 1000, ch = 300, extra = "";
+    if (place === "body" && L.plate) {
+      const [px, py, pw, ph] = L.plate;
+      Object.assign(t.style, { left: px + "px", top: py + "px", width: pw + "px", height: ph + "px" });
+      cw = Math.round(300 * pw / ph);
+      if ((P.get("tscreen") || "starting") === "starting") extra = "&en=STARTING%20SOON&es=EMPEZANDO";   // en la placa, todo en una línea
+    } else {
+      const tw = Math.round(sw * 0.5), th = Math.round(tw * 0.3), pad = Math.round(sw * 0.045);
+      const pos = P.get("tpos") || "bl";
+      extra = (pos === "br" ? "&anchor=right" : "&anchor=left") + "&align=" + (P.get("talign") || "right");
+      Object.assign(t.style, { width: tw + "px", height: th + "px",
+        left: sx + (pos === "br" ? sw - tw - pad : pad) + "px",
+        top: sy + (pos === "tl" ? pad : sh - th - pad) + "px" });
+    }
+    t.src = "titles.html?screen=" + (P.get("tscreen") || "starting") + "&lang=" + (P.get("tlang") || "both") +
+            `&cw=${cw}&ch=${ch}&x=0&y=0&w=${cw}&h=${ch}&max=185` + extra;
+  }
+  const osd = document.getElementById("osd");
+  osd.style.fontSize = L.osd + "px";
+  const msg = document.getElementById("msg");
+  const debug = t => { if (P.get("debug") === "1") { msg.textContent = t; msg.style.display = "block"; } };
+  console.log("clay-channels v5");
+
+  // ---- estática ----
+  const cv = document.getElementById("static");
+  const SW = 160, SH = Math.round(160 * sh / sw);
+  cv.width = SW; cv.height = SH;
+  const cx = cv.getContext("2d");
+  const img = cx.createImageData(SW, SH);
+  let staticOn = false, roll = 0;
+  function drawStatic() {
+    if (staticOn) {
+      const d = img.data;
+      roll = (roll + 7) % SH;
+      for (let y = 0; y < SH; y++) {
+        const band = Math.abs(y - roll) < 6 ? 60 : 0;          // franja que rueda, como al sintonizar
+        for (let x = 0; x < SW; x++) {
+          const v = Math.min(255, Math.random() * 230 + band) | 0, i = (y * SW + x) * 4;
+          d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
+        }
+      }
+      cx.putImageData(img, 0, 0);
+    }
+    requestAnimationFrame(drawStatic);
+  }
+  requestAnimationFrame(drawStatic);
+
+  // ruido de cambio de canal
+  let actx = null;
+  function zapSound(ms) {
+    if (!ZAPVOL) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === "suspended") actx.resume();
+      const len = Math.floor(actx.sampleRate * ms / 1000);
+      const buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / len * 0.5);
+      const src = actx.createBufferSource(); src.buffer = buf;
+      const f = actx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2500; f.Q.value = 0.6;
+      const g = actx.createGain(); g.gain.value = ZAPVOL * 0.6;
+      src.connect(f); f.connect(g); g.connect(actx.destination); src.start();
+    } catch (e) {}
+  }
+
+  // ---- zapping sincronizado con el reloj ----
+  // La programación sale de la hora del PC: la tele normal y la de bolsillo calculan
+  // el mismo canal en el mismo segundo, así que siempre van iguales.
+  const LEN = { "10-skater.webm": 5, "12-tigre.webm": 6.4, "17-cavernicola.webm": 9 };   // los que no duran 10 s
+  const slotOf = i => Math.max(2, Math.min(MIN, LEN[CHANNELS[i]] || 10) - 0.15);
+  const TOTAL = pool.reduce((t, i) => t + slotOf(i), 0);
+  function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  const orders = {};
+  function shuffled(k) {
+    const o = pool.slice();
+    if (!ORDER) { const r = rng(k * 7919 + 13); for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } }
+    return o;
+  }
+  function orderFor(k) {                                   // orden de la vuelta k (todos salen una vez)
+    if (orders[k]) return orders[k];
+    const o = shuffled(k), prev = shuffled(k - 1);         // que no se repita el canal al pasar de vuelta
+    if (!ORDER && o.length > 1 && o[0] === prev[prev.length - 1]) [o[0], o[1]] = [o[1], o[0]];
+    return (orders[k] = o);
+  }
+  function now() {                                         // canal y segundo actual según el reloj
+    const t = Date.now() / 1000, k = Math.floor(t / TOTAL);
+    let r = t - k * TOTAL; const o = orderFor(k);
+    for (let n = 0; n < o.length; n++) { const d = slotOf(o[n]); if (r < d) return { key: k + ":" + n, idx: o[n], off: r, left: d - r }; r -= d; }
+    return { key: k + ":0", idx: o[0], off: 0, left: slotOf(o[0]) };
+  }
+
+  const vids = [document.getElementById("vA"), document.getElementById("vB")];
+  let cur = 0, osdTimer = null, curKey = null;
+
+  function showOSD(n) {
+    osd.textContent = "CH " + String(n).padStart(2, "0");
+    osd.style.opacity = 1;
+    clearTimeout(osdTimer);
+    osdTimer = setTimeout(() => { osd.style.opacity = 0; }, 2600);
+  }
+
+  function zap(slot, first) {
+    const idx = slot.idx;
+    const nv = vids[1 - cur], ov = vids[cur];
+    const ms = first ? 250 : 450;
+    staticOn = true; cv.style.opacity = 1; if (!first) zapSound(ms);
+    ov.volume = 0;
+    nv.src = DIR + CHANNELS[idx];
+    nv.volume = VOL; nv.muted = VOL === 0;
+    const t0 = performance.now();
+    const go = () => {
+      // ponerse al día con el reloj (lo que tardó en cargar)
+      try { nv.currentTime = Math.min(slot.off + (performance.now() - t0) / 1000, (nv.duration || 10) - 0.2); } catch (e) {}
+      nv.play().catch(() => { nv.muted = true; nv.play(); });
+      setTimeout(() => {
+        ov.classList.remove("on"); ov.pause();
+        nv.classList.add("on");
+        staticOn = false; cv.style.opacity = 0;
+        cur = 1 - cur;
+        showOSD(idx + 1);
+        debug(`canal ${idx + 1}: ${CHANNELS[idx]}`);
+      }, ms);
+    };
+    if (nv.readyState >= 2) go();
+    else {
+      let done = false;
+      const once = () => { if (!done) { done = true; go(); } };
+      nv.addEventListener("loadeddata", once, { once: true });
+      nv.addEventListener("error", () => { debug("No encuentro " + DIR + CHANNELS[idx]); }, { once: true });
+      setTimeout(once, 2500);
+    }
+  }
+
+  function tick() {
+    const s = now();
+    if (s.key !== curKey) { const first = curKey === null; curKey = s.key; zap(s, first); }
+  }
+  tick();
+  setInterval(tick, 100);
+})();
+</script>
+</body>
+</html>

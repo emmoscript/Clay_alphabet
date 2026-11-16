@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Clay titles</title>
+<!--
+  Títulos de plastilina para las pantallas de Inicio / Volvemos pronto / Final.
+
+  En OBS: Fuente de navegador, 1920x1080, SIN marcar "Archivo local", y en URL:
+    http://absolute/C:/Users/emilm/Documents/Streaming-Materials/clay_alphabet/titles.html?screen=starting
+    ...?screen=brb
+    ...?screen=ending
+
+  Opciones (se agregan con &):
+    align=right|left    alinea las líneas entre sí (SOON a la derecha bajo STARTING)
+    anchor=right|left   pega el bloque de texto a ese lado de la caja
+    mobile=1            versión vertical para TikTok (fuente de 1080x1920)
+    lang=both|es|en     both = alterna español / inglés (default)
+    swap=9              segundos entre idiomas
+    es=TEXTO|LINEA2     texto propio en español ( | = salto de línea )
+    en=TEXT|LINE2       texto propio en inglés
+    x=700&y=40&w=1180&h=340   caja donde va el título (por defecto arriba a la derecha)
+    max=150             tamaño máximo de letra en px
+    color=F4F0E8        color de la plastilina (hex sin #)
+    glow=7CFF2E         agrega un brillo de ese color (por defecto no hay brillo, solo sombra)
+    bpm=120             ritmo del cabeceo (solo starting)
+    glyphs=URL          carpeta de las letras (default: glyphs/ junto a este archivo)
+    bg=1                muestra un fondo gris para probar
+-->
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  body.bg { background: #333; }
+  #stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  #msg { position: absolute; left: 20px; top: 20px; font: 600 28px system-ui, sans-serif; color: #fff;
+         background: rgba(180,0,0,.85); padding: 10px 16px; border-radius: 8px; display: none; }
+  #box { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .line { display: flex; align-items: flex-end; white-space: nowrap; }
+  .ch { display: inline-block; flex: none; position: relative; will-change: transform; }
+  .ch img { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="box"></div></div>
+<div id="msg"></div>
+<script>
+  // muestra en pantalla cualquier error, para poder verlo dentro de OBS
+  window.onerror = function (m, src, line) {
+    var d = document.getElementById("msg");
+    d.textContent = "Error: " + m + " (línea " + line + ")"; d.style.display = "block";
+  };
+  if (location.search.indexOf("debug=1") >= 0) {
+    var d = document.getElementById("msg");
+    d.textContent = "titles.html cargó - " + location.href; d.style.display = "block"; d.style.background = "rgba(0,120,0,.85)";
+  }
+</script>
+<script>
+(function () {
+  const P = new URLSearchParams(location.search);
+  const num = (k, d) => (P.has(k) && !isNaN(+P.get(k)) ? +P.get(k) : d);
+  const hexp = (k, d) => "#" + (P.get(k) || d).replace(/^#/, "");
+
+  const PRESETS = {
+    starting: { es: "EMPEZANDO",        en: "STARTING|SOON",       glow: "7CFF2E", fx: "bang"  },
+    brb:      { es: "VOLVEMOS|PRONTO",  en: "BE RIGHT|BACK",       glow: "3FF2D2", fx: "float" },
+    ending:   { es: "GRACIAS|POR VER",  en: "THANKS FOR|WATCHING", glow: "A9CBFF", fx: "neon",  box: [620, 30, 1260, 250], mbox: [120, 190, 840, 270] },
+  };
+  const screen = PRESETS[P.get("screen")] ? P.get("screen") : "starting";
+  const S = PRESETS[screen];
+  const TEXT = { es: P.get("es") || S.es, en: P.get("en") || S.en };
+  const LANG = P.get("lang") || "both";
+  const SWAP = num("swap", 9);
+  const MOBILE = P.get("mobile") === "1";
+  const W = num("cw", MOBILE ? 1080 : 1920), H = num("ch", MOBILE ? 1920 : 1080);   // cw/ch: lienzo propio (para meterlo dentro de otra página)
+  // móvil (TikTok 1080x1920): el título va debajo de la barra de arriba de TikTok y lejos de los comentarios de abajo
+  const DB = MOBILE ? (S.mbox || [90, 300, 900, 360]) : (S.box || [700, 40, 1180, 340]);
+  const BOX = { x: num("x", DB[0]), y: num("y", DB[1]), w: num("w", DB[2]), h: num("h", DB[3]) };
+  const MAX = num("max", 150);
+  const COLOR = hexp("color", "F4F0E8");
+  const GLOW = P.get("glow") ? hexp("glow", "") : null;   // brillo opcional; por defecto solo sombra
+  const BEAT = 60 / num("bpm", 120);
+  let folder = (P.get("glyphs") || "glyphs/").replace(/\/?$/, "/");
+  if (P.get("bg") === "1") document.body.classList.add("bg");
+
+  // la página está pensada a 1920x1080; si la fuente tiene otro tamaño, se escala sola
+  const stage = document.getElementById("stage");
+  // anchor=left|right: dónde se pega el bloque de texto en la caja / página
+  // align=left|right|center: alineación de las líneas ENTRE SÍ (p. ej. SOON pegado a la derecha bajo STARTING)
+  const ALIGN = P.get("anchor") || "center";
+  const LINES = { left: "flex-start", right: "flex-end", center: "center" }[P.get("align")] || "center";
+  if (ALIGN !== "center") document.getElementById("box").style.alignItems = ALIGN === "right" ? "flex-end" : "flex-start";
+  stage.style.width = W + "px"; stage.style.height = H + "px";
+  const fit = () => { const k = Math.min(innerWidth / W, innerHeight / H);
+    const ox = ALIGN === "right" ? innerWidth - W * k : ALIGN === "left" ? 0 : (innerWidth - W * k) / 2;
+    stage.style.transform = `translate(${ox}px,${(innerHeight - H * k) / 2}px) scale(${k})`; };
+  fit(); addEventListener("resize", fit);
+  const say = t => { const m = document.getElementById("msg"); m.textContent = t; m.style.display = "block"; };
+  console.log("clay-titles v10");
+
+  const FPS = 12;                         // ritmo stop-motion
+  const box = document.getElementById("box");
+  Object.assign(box.style, { left: BOX.x + "px", top: BOX.y + "px", width: BOX.w + "px", height: BOX.h + "px" });
+
+  // ---------- utilidades ----------
+  function rand(seed) {
+    let t = seed + 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+
+  // gris del alfabeto -> plastilina del color pedido, con la misma luz en todas las letras
+  function tintFilter(c) {
+    const id = "tint-" + c.slice(1);
+    const base = hex(c), shadow = base.map(v => v * 0.42), deep = base.map(v => v * 0.16), high = mix(base, [1, 1, 1], 0.6);
+    const N = 32, tables = [[], [], []];
+    for (let k = 0; k <= N; k++) {
+      const g = k / N;
+      const col = g < 0.32 ? mix(deep, shadow, g / 0.32) : g < 0.78 ? mix(shadow, base, (g - 0.32) / 0.46) : mix(base, high, (g - 0.78) / 0.22);
+      col.forEach((v, i) => tables[i].push(Math.min(1, Math.max(0, v)).toFixed(3)));
+    }
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("style", "position:absolute;width:0;height:0");
+    svg.innerHTML = `<filter id="${id}" color-interpolation-filters="sRGB"><feComponentTransfer>` +
+      ["R", "G", "B"].map((ch, i) => `<feFunc${ch} type="table" tableValues="${tables[i].join(" ")}"/>`).join("") +
+      `</feComponentTransfer></filter>`;
+    document.body.appendChild(svg);
+    return id;
+  }
+
+  function lookup(ch) {
+    const g = window.CLAY_GLYPHS.glyphs;
+    if (g[ch]) return g[ch];
+    const b = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    return g[b] || g[b.toUpperCase()] || g[b.toLowerCase()] || null;
+  }
+
+  // ---------- armar un texto ----------
+  let letters = [];          // { el, i, seed, rot, dy, born, dead, h }
+  let size = 100;
+
+  function lineWidth(line, k) {
+    let w = 0;
+    for (const ch of line) {
+      if (ch === " ") { w += 0.35 * size1; continue; }
+      const v = lookup(ch);
+      w += v ? v[0].w * k + 0.04 * size1 : 0.6 * size1;
+    }
+    return w;
+  }
+  let size1 = 1;
+
+  function build(text, now) {
+    const cap = window.CLAY_GLYPHS.cap;
+    const lines = text.split("|");
+    // tamaño que cabe en la caja: probar con 100 y escalar
+    size1 = 100;
+    const widest = Math.max(...lines.map(l => lineWidth(l, 100 / cap)));
+    size = Math.min(MAX, 100 * BOX.w / widest, BOX.h / (lines.length * 1.22));
+    size1 = size;
+    const k = size / cap;
+
+    box.innerHTML = "";
+    const block = document.createElement("div");
+    block.style.cssText = `display:flex;flex-direction:column;align-items:${LINES}`;
+    box.appendChild(block);
+    letters = [];
+    let n = 0;
+    const seenCount = {};
+    lines.forEach((line, li) => {
+      const row = document.createElement("div");
+      row.className = "line";
+      row.style.height = size * 1.22 + "px";
+      for (const ch of line) {
+        if (ch === " ") {
+          const sp = document.createElement("span");
+          sp.style.cssText = `display:inline-block;width:${0.35 * size}px`;
+          row.appendChild(sp);
+          continue;
+        }
+        const vars = lookup(ch);
+        if (!vars) continue;
+        seenCount[ch] = (seenCount[ch] || 0) + 1;
+        const g = vars[(seenCount[ch] - 1) % vars.length];
+        const el = document.createElement("span");
+        el.className = "ch";
+        el.style.width = g.w * k + "px";
+        el.style.height = g.h * k + "px";
+        el.style.margin = `0 ${0.02 * size}px ${-g.drop * k}px`;
+        el.style.opacity = "0";
+        const img = document.createElement("img");
+        img.src = folder + g.file;
+        img.draggable = false;
+        img.style.filter = `url(#${TINT})`;
+        el.appendChild(img);
+        row.appendChild(el);
+        const seed = n * 7919 + li * 104729 + 17;
+        letters.push({ el, i: n, line: li, seed, rot: (rand(seed) - 0.5) * 6, dy: (rand(seed + 3) - 0.5) * 0.05 * size,
+                       born: now + 0.25 + n * 0.07, dead: Infinity, flick: null, lift: null });
+        n++;
+      }
+      block.appendChild(row);
+    });
+  }
+
+  // ---------- efectos ----------
+  const q = t => Math.floor(t * FPS) / FPS;           // tiempo cuantizado a cuadros de 12 fps
+
+  // entrada: cae, aplasta al tocar, rebota un poco
+  function intro(u) {
+    if (u < 0) return { y: -0.9, sx: 1, sy: 1, o: 0 };
+    if (u < 0.5) { const p = u / 0.5; return { y: -0.9 * (1 - p * p), sx: 0.92, sy: 1.1, o: 1 }; }
+    if (u < 0.7) return { y: 0.05, sx: 1.16, sy: 0.82, o: 1 };
+    if (u < 0.85) return { y: -0.08, sx: 0.95, sy: 1.06, o: 1 };
+    return { y: 0, sx: 1, sy: 1, o: 1 };
+  }
+  // salida: se aplasta y se hunde
+  function outro(u) {
+    if (u < 0.3) return { y: -0.06, sx: 0.94, sy: 1.08, o: 1 };
+    if (u < 0.6) return { y: 0.05, sx: 1.2, sy: 0.7, o: 1 };
+    if (u < 1) { const p = (u - 0.6) / 0.4; return { y: 0.2 * p, sx: 1.25 + 0.2 * p, sy: 0.6 * (1 - p), o: 1 - p }; }
+    return { y: 0.2, sx: 1.4, sy: 0, o: 0 };
+  }
+  const hit = p => (p < 0.18 ? p / 0.18 : p < 0.6 ? 1 - (p - 0.18) / 0.42 : 0);   // golpe del cabeceo
+
+  let glowAmt = 0.5;
+
+  function tick() {
+    const now = performance.now() / 1000;
+    const t = q(now);
+    const boilFrame = Math.floor(now * FPS / 2);       // "hervor" de plastilina cada 2 cuadros
+
+    if (S.fx === "bang") glowAmt = 0.35 + 0.65 * Math.pow(1 - ((t % BEAT) / BEAT), 2.2);
+    if (S.fx === "float") glowAmt = 0.55 + 0.35 * Math.sin(t * 1.3);
+    if (S.fx === "neon") glowAmt = 0.45 + 0.25 * Math.sin(t * 0.7);
+
+    // levantar una letra con el rayo de la nave de vez en cuando (brb)
+    if (S.fx === "float" && letters.length && !letters.some(L => L.lift) && rand(Math.floor(now * FPS) * 31) < 0.012) {
+      const L = letters[Math.floor(rand(Math.floor(now * 7)) * letters.length)];
+      if (now > L.born + 1 && L.dead === Infinity) L.lift = now;
+    }
+
+    for (const L of letters) {
+      const a = L.dead !== Infinity ? outro((t - L.dead) / 0.38) : intro((t - L.born) / 0.42);
+      let y = a.y * size + L.dy, rot = L.rot, sx = a.sx, sy = a.sy, bright = 1, extraGlow = 0;
+
+      // hervor stop-motion: cada letra tiembla un pelín, como si la tocaran entre cuadros
+      const b = boilFrame * 97 + L.seed;
+      rot += (rand(b) - 0.5) * 1.4;
+      y += (rand(b + 1) - 0.5) * 0.012 * size;
+      const bx = (rand(b + 2) - 0.5) * 0.012 * size;
+
+      if (S.fx === "bang") {
+        const p = (((t - L.i * 0.025) % BEAT) + BEAT) % BEAT / BEAT;
+        const h = hit(p);
+        y += h * 0.09 * size;
+        rot += h * (L.i % 2 ? 5 : -5);
+        sy *= 1 - h * 0.08; sx *= 1 + h * 0.06;
+      }
+      if (S.fx === "float") {
+        y += Math.sin(t * 1.7 - L.i * 0.55) * 0.07 * size;
+        rot += Math.sin(t * 1.1 + L.i) * 2.5;
+        if (L.lift) {
+          const u = (now - L.lift) / 2.6;
+          if (u >= 1) L.lift = null;
+          else {
+            const up = u < 0.75 ? Math.sin(Math.min(1, u / 0.6) * Math.PI / 2) : 1 - (u - 0.75) / 0.25;
+            y -= up * 0.45 * size;
+            rot += Math.sin(t * 9) * 8 * up;
+            extraGlow = up;
+            if (u > 0.95) { sx *= 1.14; sy *= 0.86; }
+          }
+        }
+      }
+      if (S.fx === "neon") {
+        rot += Math.sin(t * 0.8 + L.i * 0.35) * 1.8;
+        y += Math.sin(t * 0.8 + L.i * 0.35) * 0.02 * size;
+        // parpadeo de tubo que se muere, como el letrero LIVE
+        if (!L.flick && a.o === 1 && rand(Math.floor(now * FPS) * 13 + L.seed) < 0.0035) L.flick = Math.floor(now * FPS);
+        if (L.flick !== null && L.flick !== undefined) {
+          const pat = [0.35, 1, 0.3, 0.2, 0.9, 0.45, 1];
+          const f = Math.floor(now * FPS) - L.flick;
+          if (f >= pat.length) L.flick = null; else bright = pat[f];
+        }
+      }
+
+      L.el.style.opacity = a.o;
+      L.el.style.transformOrigin = "50% 90%";
+      L.el.style.transform = `translate(${bx}px,${y}px) rotate(${rot}deg) scale(${sx},${sy})`;
+      // sombra de plastilina: se separa y se suaviza cuando la letra sube o se inclina
+      const lift = Math.max(0, -(y - L.dy)) / size + extraGlow * 0.45;
+      const sh = `drop-shadow(${(0.035 + 0.05 * lift) * size}px ${(0.06 + 0.12 * lift) * size}px ${(0.035 + 0.08 * lift) * size}px rgba(0,0,0,${(0.6 - 0.25 * Math.min(1, lift)).toFixed(2)}))`;
+      let gl = "";
+      if (GLOW) {
+        const g = Math.max(0, glowAmt * bright + extraGlow);
+        gl = `drop-shadow(0 0 ${(0.04 + 0.1 * g) * size}px ${GLOW}${Math.round(Math.min(1, 0.25 + 0.6 * g) * 255).toString(16).padStart(2, "0")}) `;
+      }
+      L.el.style.filter = `brightness(${0.55 + 0.45 * bright}) ` + gl + sh;
+    }
+  }
+
+  // ---------- idiomas ----------
+  const order = LANG === "both" ? ["es", "en"] : [LANG === "en" ? "en" : "es"];
+  let li = 0;
+  function swap() {
+    const now = performance.now() / 1000;
+    letters.forEach((L, i) => { L.dead = now + i * 0.04; });
+    const wait = letters.length * 40 + 450;
+    setTimeout(() => { li = (li + 1) % order.length; build(TEXT[order[li]], performance.now() / 1000); }, wait);
+  }
+
+  let TINT;
+  function start() {
+    TINT = tintFilter(COLOR);
+    build(TEXT[order[0]], performance.now() / 1000);
+    setInterval(tick, 1000 / FPS);
+    if (order.length > 1) setInterval(swap, SWAP * 1000);
+  }
+
+  // cargar el alfabeto (local o de internet)
+  const s = document.createElement("script");
+  s.src = folder + "glyphs.js";
+  s.onload = start;
+  s.onerror = () => {
+    folder = "https://cdn.jsdelivr.net/gh/emmoscript/Clay_alphabet@v41/glyphs/";
+    const s2 = document.createElement("script");
+    s2.src = folder + "glyphs.js";
+    s2.onload = start;
+    s2.onerror = () => say("No encuentro las letras: pon titles.html junto a la carpeta glyphs");
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>
